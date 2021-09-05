@@ -3,6 +3,7 @@ package bytebuf
 import (
 	"github.com/koykov/bytealg"
 	"github.com/koykov/fastconv"
+	"github.com/koykov/x2bytes"
 )
 
 // A wrapper around ChainBuf that allows to accumulate buffer data and use only necessary part.
@@ -80,4 +81,13 @@ func (b *AccumulativeBuffer) RangeStringCopy(off, len int) string {
 // Get last error caught in Write* methods.
 func (b AccumulativeBuffer) Error() error {
 	return b.err
+}
+
+// Conversion to bytes function.
+func ChainBufToBytes(dst []byte, val interface{}) ([]byte, error) {
+	if b, ok := val.(*ChainBuf); ok {
+		dst = append(dst, *b...)
+		return dst, nil
+	}
+	return dst, x2bytes.ErrUnknownType
 }
