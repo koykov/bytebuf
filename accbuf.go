@@ -3,31 +3,30 @@ package bytebuf
 import (
 	"github.com/koykov/bytealg"
 	"github.com/koykov/fastconv"
-	"github.com/koykov/x2bytes"
 )
 
 // A wrapper around ChainBuf that allows to accumulate buffer data and use only necessary part.
 //
 // See StakeOut and Staked* methods.
-type AccumulativeBuffer struct {
+type AccumulativeBuf struct {
 	buf ChainBuf
 	off int
 	err error
 }
 
 // Stake out current offset for further use.
-func (b *AccumulativeBuffer) StakeOut() *AccumulativeBuffer {
+func (b *AccumulativeBuf) StakeOut() *AccumulativeBuf {
 	b.off = b.Len()
 	return b
 }
 
 // Get staked offset.
-func (b *AccumulativeBuffer) StakedOffset() int {
+func (b *AccumulativeBuf) StakedOffset() int {
 	return b.off
 }
 
 // Get accumulated bytes from staked offset.
-func (b *AccumulativeBuffer) StakedBytes() []byte {
+func (b *AccumulativeBuf) StakedBytes() []byte {
 	if b.off >= b.Len() {
 		return nil
 	}
@@ -35,12 +34,12 @@ func (b *AccumulativeBuffer) StakedBytes() []byte {
 }
 
 // Get copy of accumulated bytes from staked offset.
-func (b *AccumulativeBuffer) StakedBytesCopy() []byte {
+func (b *AccumulativeBuf) StakedBytesCopy() []byte {
 	return bytealg.Copy(b.StakedBytes())
 }
 
 // Get accumulated bytes as string.
-func (b *AccumulativeBuffer) StakedString() string {
+func (b *AccumulativeBuf) StakedString() string {
 	if b.off >= b.Len() {
 		return ""
 	}
@@ -48,12 +47,12 @@ func (b *AccumulativeBuffer) StakedString() string {
 }
 
 // Get copy of accumulated bytes as string.
-func (b *AccumulativeBuffer) StakedStringCopy() string {
+func (b *AccumulativeBuf) StakedStringCopy() string {
 	return bytealg.CopyStr(b.StakedString())
 }
 
 // Get buffer bytes from offset off with length len.
-func (b *AccumulativeBuffer) RangeBytes(off, len int) []byte {
+func (b *AccumulativeBuf) RangeBytes(off, len int) []byte {
 	if off >= 0 && off+len < b.buf.Len() {
 		return nil
 	}
@@ -61,12 +60,12 @@ func (b *AccumulativeBuffer) RangeBytes(off, len int) []byte {
 }
 
 // Copy version of RangeBytes().
-func (b *AccumulativeBuffer) RangeBytesCopy(off, len int) []byte {
+func (b *AccumulativeBuf) RangeBytesCopy(off, len int) []byte {
 	return bytealg.Copy(b.RangeBytes(off, len))
 }
 
 // Get buffer bytes as string from offset off with length len.
-func (b *AccumulativeBuffer) RangeString(off, len int) string {
+func (b *AccumulativeBuf) RangeString(off, len int) string {
 	if off >= 0 && off+len < b.buf.Len() {
 		return ""
 	}
@@ -74,20 +73,11 @@ func (b *AccumulativeBuffer) RangeString(off, len int) string {
 }
 
 // Copy version of RangeString().
-func (b *AccumulativeBuffer) RangeStringCopy(off, len int) string {
+func (b *AccumulativeBuf) RangeStringCopy(off, len int) string {
 	return bytealg.CopyStr(b.RangeString(off, len))
 }
 
 // Get last error caught in Write* methods.
-func (b AccumulativeBuffer) Error() error {
+func (b AccumulativeBuf) Error() error {
 	return b.err
-}
-
-// Conversion to bytes function.
-func ChainBufToBytes(dst []byte, val interface{}) ([]byte, error) {
-	if b, ok := val.(*ChainBuf); ok {
-		dst = append(dst, *b...)
-		return dst, nil
-	}
-	return dst, x2bytes.ErrUnknownType
 }
