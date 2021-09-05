@@ -11,6 +11,7 @@ import (
 type AccumulativeBuffer struct {
 	buf ChainBuf
 	off int
+	err error
 }
 
 // Stake out current offset for further use.
@@ -74,4 +75,9 @@ func (b *AccumulativeBuffer) RangeString(off, len int) string {
 // Copy version of RangeString().
 func (b *AccumulativeBuffer) RangeStringCopy(off, len int) string {
 	return bytealg.CopyStr(b.RangeString(off, len))
+}
+
+// Get last error caught in Write* methods.
+func (b AccumulativeBuffer) Error() error {
+	return b.err
 }

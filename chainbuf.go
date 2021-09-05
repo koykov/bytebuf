@@ -75,8 +75,8 @@ func (b *ChainBuf) WriteBool(v bool) *ChainBuf {
 }
 
 // Write v with arbitrary type to the buffer.
-func (b *ChainBuf) WriteX(v interface{}) *ChainBuf {
-	*b, _ = x2bytes.ToBytes(*b, v)
+func (b *ChainBuf) WriteX(x interface{}) *ChainBuf {
+	*b, _ = x2bytes.ToBytes(*b, x)
 	return b
 }
 

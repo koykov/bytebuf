@@ -1,5 +1,7 @@
 package bytebuf
 
+import "github.com/koykov/x2bytes"
+
 // Contains wrapper methods over inner ChainBuf.
 
 // Get contents of the buffer.
@@ -42,30 +44,31 @@ func (b *AccumulativeBuffer) WriteStr(s string) *AccumulativeBuffer {
 
 // Write integer value to the buffer.
 func (b *AccumulativeBuffer) WriteInt(i int64) *AccumulativeBuffer {
-	b.buf.WriteInt(i)
+	b.buf, b.err = x2bytes.IntToBytes(b.buf, i)
 	return b
 }
 
 // Write unsigned integer value to the buffer.
 func (b *AccumulativeBuffer) WriteUint(u uint64) *AccumulativeBuffer {
-	b.buf.WriteUint(u)
+	b.buf, b.err = x2bytes.UintToBytes(b.buf, u)
 	return b
 }
 
 // Write float value to the buffer.
 func (b *AccumulativeBuffer) WriteFloat(f float64) *AccumulativeBuffer {
-	b.buf.WriteFloat(f)
+	b.buf, b.err = x2bytes.FloatToBytes(b.buf, f)
 	return b
 }
 
 // Write boolean value to the buffer.
 func (b *AccumulativeBuffer) WriteBool(v bool) *AccumulativeBuffer {
-	b.buf.WriteBool(v)
+	b.buf, b.err = x2bytes.BoolToBytes(b.buf, v)
 	return b
 }
 
-func (b *AccumulativeBuffer) WriteX(v interface{}) *AccumulativeBuffer {
-	b.buf.WriteX(v)
+// Write v with arbitrary type to the buffer.
+func (b *AccumulativeBuffer) WriteX(x interface{}) *AccumulativeBuffer {
+	b.buf, b.err = x2bytes.ToBytes(b.buf, x)
 	return b
 }
 
@@ -122,4 +125,3 @@ func (b *AccumulativeBuffer) Reset() *AccumulativeBuffer {
 	b.buf.Reset()
 	return b
 }
-
