@@ -80,7 +80,7 @@ func (b *AccumulativeBuf) WriteMarshallerTo(m MarshallerTo) *AccumulativeBuf {
 	n := b.Len()
 	d := m.Size()
 	b.GrowDelta(d)
-	_, b.err = m.MarshalTo(b.Bytes()[n:])
+	_, b.err = m.MarshalTo(b.buf[n:])
 	return b
 }
 

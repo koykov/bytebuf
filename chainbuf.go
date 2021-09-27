@@ -12,12 +12,6 @@ import (
 // Primitive byte buffer with chain call support.
 type ChainBuf []byte
 
-// MarshallerTo interface to write struct like Protobuf.
-type MarshallerTo interface {
-	Size() int
-	MarshalTo(data []byte) (int, error)
-}
-
 // Get contents of the buffer.
 func (b *ChainBuf) Bytes() []byte {
 	return *b
