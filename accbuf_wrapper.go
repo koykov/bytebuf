@@ -72,6 +72,18 @@ func (b *AccumulativeBuf) WriteX(x interface{}) *AccumulativeBuf {
 	return b
 }
 
+// Marshal data of struct implemented MarshallerTo interface.
+func (b *AccumulativeBuf) WriteMarshallerTo(m MarshallerTo) *AccumulativeBuf {
+	if m == nil {
+		return b
+	}
+	n := b.Len()
+	d := m.Size()
+	b.GrowDelta(d)
+	_, b.err = m.MarshalTo(b.Bytes()[n:])
+	return b
+}
+
 // Replace old to new bytes in buffer.
 func (b *AccumulativeBuf) Replace(old, new []byte, n int) *AccumulativeBuf {
 	b.buf.Replace(old, new, n)

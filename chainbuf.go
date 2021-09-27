@@ -12,6 +12,12 @@ import (
 // Primitive byte buffer with chain call support.
 type ChainBuf []byte
 
+// MarshallerTo interface to write struct like Protobuf.
+type MarshallerTo interface {
+	Size() int
+	MarshalTo(data []byte) (int, error)
+}
+
 // Get contents of the buffer.
 func (b *ChainBuf) Bytes() []byte {
 	return *b
@@ -77,6 +83,18 @@ func (b *ChainBuf) WriteBool(v bool) *ChainBuf {
 // Write v with arbitrary type to the buffer.
 func (b *ChainBuf) WriteX(x interface{}) *ChainBuf {
 	*b, _ = x2bytes.ToBytes(*b, x)
+	return b
+}
+
+// Marshal data of struct implemented MarshallerTo interface.
+func (b *ChainBuf) WriteMarshallerTo(m MarshallerTo) *ChainBuf {
+	if m == nil {
+		return b
+	}
+	n := b.Len()
+	d := m.Size()
+	b.GrowDelta(d)
+	_, _ = m.MarshalTo(b.Bytes()[n:])
 	return b
 }
 
