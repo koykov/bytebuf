@@ -25,6 +25,11 @@ func (b *AccumulativeBuf) StakedOffset() int {
 	return b.off
 }
 
+// Get length of accumulated bytes.
+func (b *AccumulativeBuf) StakedLen() int {
+	return b.Len() - b.off
+}
+
 // Get accumulated bytes from staked offset.
 func (b *AccumulativeBuf) StakedBytes() []byte {
 	if b.off >= b.Len() {
