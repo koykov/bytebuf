@@ -1,6 +1,6 @@
-github.com/koykov/bytealg v0.0.0-20220528213442-ac92b7cc2f07 h1:GNAcqL+VEnO02kTK2F9wBBgLB6TUYESoLJXTtXblnIw=
-github.com/koykov/bytealg v0.0.0-20220528213442-ac92b7cc2f07/go.mod h1:GsRL37HNnRhJ5Igs0WV7sIVWo8R7qBB9KJh6wzVUFe0=
-github.com/koykov/fastconv v0.0.0-20211028200057-f6897ace3bc2 h1:jIlvXIudUQ6ER2y/oExe8Qa3lnZ+6C0BpPthjfDhxvs=
-github.com/koykov/fastconv v0.0.0-20211028200057-f6897ace3bc2/go.mod h1:JXdtdh0aCcSmxLsVUoYP61lmxpL6dWOXEKxCIR+MlGg=
-github.com/koykov/x2bytes v0.0.0-20211030173929-204cb7cc5e84 h1:63PXDfdREZrUYLsuYfdeNvZcMawd51C5U/iONVd4L5M=
-github.com/koykov/x2bytes v0.0.0-20211030173929-204cb7cc5e84/go.mod h1:WYC0GA70RW4XAE3FRTVCYmC8UhHO3LEm26g795qn7Jo=
+github.com/koykov/bytealg v1.0.1 h1:WlD9/4PMThmfQuIRVpVCujzM/3AVTEwlgvaYrErO9Nk=
+github.com/koykov/bytealg v1.0.1/go.mod h1:kMvejxwPkAt7YfHpB1PQ/utMwKpHSY54u1rCxna6Wvg=
+github.com/koykov/fastconv v1.0.0 h1:WnsCYcrrQkUWEKK4VbVX7BuGb6jFhE8Q0Ebl3eAkHic=
+github.com/koykov/fastconv v1.0.0/go.mod h1:Y7I12pumAx+2iH1Yh0X85UpywP7IET/+M7S17toJBes=
+github.com/koykov/x2bytes v1.0.0 h1:nnnGrTKXCSDhk/lorPD7Eee9VP5CN0cz8cOkfQqTJow=
+github.com/koykov/x2bytes v1.0.0/go.mod h1:rusmMXxjFlCnnTqtNIfTyOHykd5blbxonovNC94zONg=
