@@ -2,8 +2,11 @@ package bytebuf
 
 import (
 	"bytes"
+	"net/url"
 	"strconv"
 	"testing"
+
+	"github.com/koykov/fastconv"
 )
 
 func TestChainBuf(t *testing.T) {
@@ -17,6 +20,19 @@ func TestChainBuf(t *testing.T) {
 
 		if !bytes.Equal(cb.Bytes(), expectWS) {
 			t.Error("ChainBuf.Write*: mismatch result and expectation")
+		}
+	})
+	t.Run("apply fn", func(t *testing.T) {
+		cb := &ChainBuf{}
+		cb.WriteStr("foo").
+			WriteApplyFnStr("?q=front&p=1", func(dst, p []byte) []byte {
+				p1 := url.QueryEscape(fastconv.B2S(p))
+				dst = append(dst, p1...)
+				return dst
+			}).
+			WriteStr("bar")
+		if cb.String() != "foo%3Fq%3Dfront%26p%3D1bar" {
+			t.Error("ChainBuf.WriteApplyFn*: mismatch result and expectation")
 		}
 	})
 }
