@@ -5,7 +5,7 @@ import (
 	"github.com/koykov/fastconv"
 )
 
-// A wrapper around ChainBuf that allows to accumulate buffer data and use only necessary part.
+// AccumulativeBuf is a wrapper around ChainBuf that allows to accumulate buffer data and use only necessary part.
 //
 // See StakeOut and Staked* methods.
 type AccumulativeBuf struct {
@@ -14,23 +14,23 @@ type AccumulativeBuf struct {
 	err error
 }
 
-// Stake out current offset for further use.
+// StakeOut saves current offset for further use.
 func (b *AccumulativeBuf) StakeOut() *AccumulativeBuf {
 	b.off = b.Len()
 	return b
 }
 
-// Get staked offset.
+// StakedOffset returns staked offset.
 func (b *AccumulativeBuf) StakedOffset() int {
 	return b.off
 }
 
-// Get length of accumulated bytes.
+// StakedLen returns length of accumulated bytes since staked offset.
 func (b *AccumulativeBuf) StakedLen() int {
 	return b.Len() - b.off
 }
 
-// Get accumulated bytes from staked offset.
+// StakedBytes returns accumulated bytes from staked offset.
 func (b *AccumulativeBuf) StakedBytes() []byte {
 	if b.off >= b.Len() {
 		return nil
@@ -38,12 +38,12 @@ func (b *AccumulativeBuf) StakedBytes() []byte {
 	return b.buf[b.off:]
 }
 
-// Get copy of accumulated bytes from staked offset.
+// StakedBytesCopy returns copy of accumulated bytes since staked offset.
 func (b *AccumulativeBuf) StakedBytesCopy() []byte {
 	return bytealg.Copy(b.StakedBytes())
 }
 
-// Get accumulated bytes as string.
+// StakedString returns accumulated bytes as string.
 func (b *AccumulativeBuf) StakedString() string {
 	if b.off >= b.Len() {
 		return ""
@@ -51,12 +51,12 @@ func (b *AccumulativeBuf) StakedString() string {
 	return b.String()[b.off:]
 }
 
-// Get copy of accumulated bytes as string.
+// StakedStringCopy returns copy of accumulated bytes as string.
 func (b *AccumulativeBuf) StakedStringCopy() string {
 	return bytealg.CopyStr(b.StakedString())
 }
 
-// Get buffer bytes from offset off with length len.
+// RangeBytes returns buffer bytes from offset off with length len.
 func (b *AccumulativeBuf) RangeBytes(off, len int) []byte {
 	if off >= 0 && off+len < b.buf.Len() {
 		return nil
@@ -64,12 +64,12 @@ func (b *AccumulativeBuf) RangeBytes(off, len int) []byte {
 	return b.buf[off : off+len]
 }
 
-// Copy version of RangeBytes().
+// RangeBytesCopy copies result of RangeBytes().
 func (b *AccumulativeBuf) RangeBytesCopy(off, len int) []byte {
 	return bytealg.Copy(b.RangeBytes(off, len))
 }
 
-// Get buffer bytes as string from offset off with length len.
+// RangeString returns buffer bytes as string from offset off with length len.
 func (b *AccumulativeBuf) RangeString(off, len int) string {
 	if off >= 0 && off+len < b.buf.Len() {
 		return ""
@@ -77,7 +77,7 @@ func (b *AccumulativeBuf) RangeString(off, len int) string {
 	return fastconv.B2S(b.buf[off : off+len])
 }
 
-// Copy version of RangeString().
+// RangeStringCopy copies result of RangeString().
 func (b *AccumulativeBuf) RangeStringCopy(off, len int) string {
 	return bytealg.CopyStr(b.RangeString(off, len))
 }
