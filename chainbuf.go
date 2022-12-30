@@ -9,15 +9,15 @@ import (
 	"github.com/koykov/x2bytes"
 )
 
-// Primitive byte buffer with chain call support.
+// ChainBuf is a primitive byte buffer with chain call support.
 type ChainBuf []byte
 
-// Get contents of the buffer.
+// Bytes returns contents of the buffer.
 func (b *ChainBuf) Bytes() []byte {
 	return *b
 }
 
-// Get copy of the buffer.
+// BytesCopy returns copy of the buffer.
 func (b *ChainBuf) BytesCopy() []byte {
 	return bytealg.Copy(*b)
 }
@@ -27,7 +27,7 @@ func (b *ChainBuf) String() string {
 	return fastconv.B2S(*b)
 }
 
-// Get copy of the buffer as string.
+// StringCopy returns copy of the buffer contents as string.
 func (b *ChainBuf) StringCopy() string {
 	return bytealg.CopyStr(fastconv.B2S(*b))
 }
@@ -38,49 +38,49 @@ func (b *ChainBuf) Write(p []byte) *ChainBuf {
 	return b
 }
 
-// Write single byte.
+// WriteByte writes single byte.
 func (b *ChainBuf) WriteByte(p byte) *ChainBuf {
 	*b = append(*b, p)
 	return b
 }
 
-// Write string to the buffer.
+// WriteStr writes string to the buffer.
 func (b *ChainBuf) WriteStr(s string) *ChainBuf {
 	*b = append(*b, s...)
 	return b
 }
 
-// Write integer value to the buffer.
+// WriteInt writes integer value to the buffer.
 func (b *ChainBuf) WriteInt(i int64) *ChainBuf {
 	*b, _ = x2bytes.IntToBytes(*b, i)
 	return b
 }
 
-// Write unsigned integer value to the buffer.
+// WriteUint writes unsigned integer value to the buffer.
 func (b *ChainBuf) WriteUint(u uint64) *ChainBuf {
 	*b, _ = x2bytes.UintToBytes(*b, u)
 	return b
 }
 
-// Write float value to the buffer.
+// WriteFloat writes float value to the buffer.
 func (b *ChainBuf) WriteFloat(f float64) *ChainBuf {
 	*b, _ = x2bytes.FloatToBytes(*b, f)
 	return b
 }
 
-// Write boolean value to the buffer.
+// WriteBool writes boolean value to the buffer.
 func (b *ChainBuf) WriteBool(v bool) *ChainBuf {
 	*b, _ = x2bytes.BoolToBytes(*b, v)
 	return b
 }
 
-// Write v with arbitrary type to the buffer.
+// WriteX write x with arbitrary type to the buffer.
 func (b *ChainBuf) WriteX(x interface{}) *ChainBuf {
 	*b, _ = x2bytes.ToBytes(*b, x)
 	return b
 }
 
-// Marshal data of struct implemented MarshallerTo interface.
+// WriteMarshallerTo marshal data of struct implemented MarshallerTo interface and write it to the buffer.
 func (b *ChainBuf) WriteMarshallerTo(m MarshallerTo) *ChainBuf {
 	if m == nil {
 		return b
@@ -92,7 +92,7 @@ func (b *ChainBuf) WriteMarshallerTo(m MarshallerTo) *ChainBuf {
 	return b
 }
 
-// Replace old to new bytes in buffer.
+// Replace replaces old bytes to new in buffer.
 func (b *ChainBuf) Replace(old, new []byte, n int) *ChainBuf {
 	if b.Len() == 0 || n == 0 {
 		return b
@@ -115,32 +115,30 @@ func (b *ChainBuf) Replace(old, new []byte, n int) *ChainBuf {
 	return b
 }
 
-// Replace old to new strings in buffer.
+// ReplaceStr replace old to new substrings in buffer.
 func (b *ChainBuf) ReplaceStr(old, new string, n int) *ChainBuf {
 	return b.Replace(fastconv.S2B(old), fastconv.S2B(new), n)
 }
 
-// Replace all old to new bytes in buffer.
+// ReplaceAll replace all occurrences of old bytes to new in buffer.
 func (b *ChainBuf) ReplaceAll(old, new []byte) *ChainBuf {
 	return b.Replace(old, new, -1)
 }
 
-// Replace all old to new strings in buffer.
+// ReplaceStrAll replaces all occurrences of old substrings to new in buffer.
 func (b *ChainBuf) ReplaceStrAll(old, new string) *ChainBuf {
 	return b.Replace(fastconv.S2B(old), fastconv.S2B(new), -1)
 }
 
-// Get length of the buffer.
 func (b *ChainBuf) Len() int {
 	return len(*b)
 }
 
-// Get capacity of the buffer.
 func (b *ChainBuf) Cap() int {
 	return cap(*b)
 }
 
-// Grow length of the buffer.
+// Grow increases length of the buffer.
 func (b *ChainBuf) Grow(newLen int) *ChainBuf {
 	if newLen <= 0 {
 		return b
@@ -159,14 +157,13 @@ func (b *ChainBuf) Grow(newLen int) *ChainBuf {
 	return b
 }
 
-// Grow length of the buffer to actual length + delta.
+// GrowDelta increases length of the buffer to actual length + delta.
 //
 // See Grow().
 func (b *ChainBuf) GrowDelta(delta int) *ChainBuf {
 	return b.Grow(b.Len() + delta)
 }
 
-// Reset length of the buffer.
 func (b *ChainBuf) Reset() *ChainBuf {
 	*b = (*b)[:0]
 	return b

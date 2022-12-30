@@ -7,7 +7,7 @@ func init() {
 	x2bytes.RegisterToBytesFn(AccumulativeBufToBytes)
 }
 
-// Conversion to bytes function.
+// ChainBufToBytes registers x2bytes conversion function accepts ChainBuf.
 func ChainBufToBytes(dst []byte, val interface{}) ([]byte, error) {
 	if b, ok := val.(*ChainBuf); ok {
 		dst = append(dst, *b...)
@@ -16,7 +16,7 @@ func ChainBufToBytes(dst []byte, val interface{}) ([]byte, error) {
 	return dst, x2bytes.ErrUnknownType
 }
 
-// Conversion to bytes function.
+// AccumulativeBufToBytes registers x2bytes conversion function accepts AccumulativeBuf.
 func AccumulativeBufToBytes(dst []byte, val interface{}) ([]byte, error) {
 	if b, ok := val.(*AccumulativeBuf); ok {
 		dst = append(dst, b.Bytes()...)
