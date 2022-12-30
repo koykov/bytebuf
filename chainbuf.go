@@ -92,6 +92,18 @@ func (b *ChainBuf) WriteMarshallerTo(m MarshallerTo) *ChainBuf {
 	return b
 }
 
+// WriteApplyFn applies fn to p and write result to the buffer.
+func (b *ChainBuf) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) *ChainBuf {
+	*b = fn(*b, p)
+	return b
+}
+
+// WriteApplyFnStr applies fn to s and write result to the buffer.
+func (b *ChainBuf) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *ChainBuf {
+	*b = fn(*b, fastconv.S2B(s))
+	return b
+}
+
 // Replace replaces old bytes to new in buffer.
 func (b *ChainBuf) Replace(old, new []byte, n int) *ChainBuf {
 	if b.Len() == 0 || n == 0 {

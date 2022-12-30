@@ -1,6 +1,8 @@
 package bytebuf
 
-import "github.com/koykov/x2bytes"
+import (
+	"github.com/koykov/x2bytes"
+)
 
 // Contains wrapper methods over inner ChainBuf.
 
@@ -81,6 +83,18 @@ func (b *AccumulativeBuf) WriteMarshallerTo(m MarshallerTo) *AccumulativeBuf {
 	d := m.Size()
 	b.GrowDelta(d)
 	_, b.err = m.MarshalTo(b.buf[n:])
+	return b
+}
+
+// WriteApplyFn applies fn to p and write result to the buffer.
+func (b *AccumulativeBuf) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) *AccumulativeBuf {
+	b.buf.WriteApplyFn(p, fn)
+	return b
+}
+
+// WriteApplyFnStr applies fn to s and write result to the buffer.
+func (b *AccumulativeBuf) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *AccumulativeBuf {
+	b.buf.WriteApplyFnStr(s, fn)
 	return b
 }
 
