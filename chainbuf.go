@@ -29,7 +29,7 @@ func (b *ChainBuf) String() string {
 
 // StringCopy returns copy of the buffer contents as string.
 func (b *ChainBuf) StringCopy() string {
-	return bytealg.CopyStr(fastconv.B2S(*b))
+	return bytealg.Copy[string](fastconv.B2S(*b))
 }
 
 // Write bytes to the buffer.

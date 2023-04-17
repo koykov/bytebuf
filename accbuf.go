@@ -53,7 +53,7 @@ func (b *AccumulativeBuf) StakedString() string {
 
 // StakedStringCopy returns copy of accumulated bytes as string.
 func (b *AccumulativeBuf) StakedStringCopy() string {
-	return bytealg.CopyStr(b.StakedString())
+	return bytealg.Copy[string](b.StakedString())
 }
 
 // RangeBytes returns buffer bytes from offset off with length len.
@@ -79,10 +79,10 @@ func (b *AccumulativeBuf) RangeString(off, len int) string {
 
 // RangeStringCopy copies result of RangeString().
 func (b *AccumulativeBuf) RangeStringCopy(off, len int) string {
-	return bytealg.CopyStr(b.RangeString(off, len))
+	return bytealg.Copy[string](b.RangeString(off, len))
 }
 
 // Get last error caught in Write* methods.
-func (b AccumulativeBuf) Error() error {
+func (b *AccumulativeBuf) Error() error {
 	return b.err
 }
