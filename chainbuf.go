@@ -45,7 +45,14 @@ func (b *ChainBuf) WriteByte(p byte) *ChainBuf {
 }
 
 // WriteStr writes string to the buffer.
+// DEPRECATED: use WriteString() instead.
 func (b *ChainBuf) WriteStr(s string) *ChainBuf {
+	*b = append(*b, s...)
+	return b
+}
+
+// WriteString writes string to the buffer.
+func (b *ChainBuf) WriteString(s string) *ChainBuf {
 	*b = append(*b, s...)
 	return b
 }
@@ -99,7 +106,14 @@ func (b *ChainBuf) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) *ChainB
 }
 
 // WriteApplyFnStr applies fn to s and write result to the buffer.
+// DEPRECATED: use WriteApplyFnString() instead.
 func (b *ChainBuf) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *ChainBuf {
+	*b = fn(*b, fastconv.S2B(s))
+	return b
+}
+
+// WriteApplyFnString applies fn to s and write result to the buffer.
+func (b *ChainBuf) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *ChainBuf {
 	*b = fn(*b, fastconv.S2B(s))
 	return b
 }
@@ -128,7 +142,13 @@ func (b *ChainBuf) Replace(old, new []byte, n int) *ChainBuf {
 }
 
 // ReplaceStr replace old to new substrings in buffer.
+// DEPRECATED: use ReplaceString() instead.
 func (b *ChainBuf) ReplaceStr(old, new string, n int) *ChainBuf {
+	return b.ReplaceString(old, new, n)
+}
+
+// ReplaceString replace old to new substrings in buffer.
+func (b *ChainBuf) ReplaceString(old, new string, n int) *ChainBuf {
 	return b.Replace(fastconv.S2B(old), fastconv.S2B(new), n)
 }
 
@@ -138,7 +158,13 @@ func (b *ChainBuf) ReplaceAll(old, new []byte) *ChainBuf {
 }
 
 // ReplaceStrAll replaces all occurrences of old substrings to new in buffer.
+// DEPRECATED: use ReplaceStringAll() instead.
 func (b *ChainBuf) ReplaceStrAll(old, new string) *ChainBuf {
+	return b.ReplaceStringAll(old, new)
+}
+
+// ReplaceStringAll replaces all occurrences of old substrings to new in buffer.
+func (b *ChainBuf) ReplaceStringAll(old, new string) *ChainBuf {
 	return b.Replace(fastconv.S2B(old), fastconv.S2B(new), -1)
 }
 
