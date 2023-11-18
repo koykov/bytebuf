@@ -6,7 +6,7 @@ import (
 )
 
 func TestAccumulative(t *testing.T) {
-	t.Run("ab write", func(t *testing.T) {
+	t.Run("write", func(t *testing.T) {
 		ab := &Accumulative{}
 		ab.WriteString("foobar").
 			StakeOut().
@@ -23,7 +23,7 @@ func TestAccumulative(t *testing.T) {
 }
 
 func BenchmarkAccumulative(b *testing.B) {
-	b.Run("ab write", func(b *testing.B) {
+	b.Run("write", func(b *testing.B) {
 		ab := &Accumulative{}
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {

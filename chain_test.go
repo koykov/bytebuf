@@ -10,7 +10,7 @@ import (
 )
 
 func TestChain(t *testing.T) {
-	t.Run("cb write", func(t *testing.T) {
+	t.Run("write", func(t *testing.T) {
 		cb := &Chain{}
 		cb.Write(stage.b).WriteByte('-').
 			WriteString(stage.s).WriteByte('-').
@@ -38,7 +38,7 @@ func TestChain(t *testing.T) {
 }
 
 func BenchmarkChain(b *testing.B) {
-	b.Run("cb write", func(b *testing.B) {
+	b.Run("write", func(b *testing.B) {
 		cb := &Chain{}
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
