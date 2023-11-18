@@ -2,7 +2,7 @@ package bytebuf
 
 // AccBufWriter is a wrapper around AccBuf that implements IO writers interfaces.
 type AccBufWriter struct {
-	AccBuf *AccumulativeBuf
+	AccBuf *Accumulative
 }
 
 func (b AccBufWriter) Write(p []byte) (int, error) {

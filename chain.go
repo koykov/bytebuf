@@ -9,86 +9,86 @@ import (
 	"github.com/koykov/x2bytes"
 )
 
-// ChainBuf is a primitive byte buffer with chain call support.
-type ChainBuf []byte
+// Chain is a primitive byte buffer with chain call support.
+type Chain []byte
 
 // Bytes returns contents of the buffer.
-func (b *ChainBuf) Bytes() []byte {
+func (b *Chain) Bytes() []byte {
 	return *b
 }
 
 // BytesCopy returns copy of the buffer.
-func (b *ChainBuf) BytesCopy() []byte {
+func (b *Chain) BytesCopy() []byte {
 	return bytealg.Copy(*b)
 }
 
 // Get contents of the buffer as string.
-func (b *ChainBuf) String() string {
+func (b *Chain) String() string {
 	return fastconv.B2S(*b)
 }
 
 // StringCopy returns copy of the buffer contents as string.
-func (b *ChainBuf) StringCopy() string {
+func (b *Chain) StringCopy() string {
 	return bytealg.Copy[string](fastconv.B2S(*b))
 }
 
 // Write bytes to the buffer.
-func (b *ChainBuf) Write(p []byte) *ChainBuf {
+func (b *Chain) Write(p []byte) *Chain {
 	*b = append(*b, p...)
 	return b
 }
 
 // WriteByte writes single byte.
-func (b *ChainBuf) WriteByte(p byte) *ChainBuf {
+func (b *Chain) WriteByte(p byte) *Chain {
 	*b = append(*b, p)
 	return b
 }
 
 // WriteStr writes string to the buffer.
 // DEPRECATED: use WriteString() instead.
-func (b *ChainBuf) WriteStr(s string) *ChainBuf {
+func (b *Chain) WriteStr(s string) *Chain {
 	*b = append(*b, s...)
 	return b
 }
 
 // WriteString writes string to the buffer.
-func (b *ChainBuf) WriteString(s string) *ChainBuf {
+func (b *Chain) WriteString(s string) *Chain {
 	*b = append(*b, s...)
 	return b
 }
 
 // WriteInt writes integer value to the buffer.
-func (b *ChainBuf) WriteInt(i int64) *ChainBuf {
+func (b *Chain) WriteInt(i int64) *Chain {
 	*b, _ = x2bytes.IntToBytes(*b, i)
 	return b
 }
 
 // WriteUint writes unsigned integer value to the buffer.
-func (b *ChainBuf) WriteUint(u uint64) *ChainBuf {
+func (b *Chain) WriteUint(u uint64) *Chain {
 	*b, _ = x2bytes.UintToBytes(*b, u)
 	return b
 }
 
 // WriteFloat writes float value to the buffer.
-func (b *ChainBuf) WriteFloat(f float64) *ChainBuf {
+func (b *Chain) WriteFloat(f float64) *Chain {
 	*b, _ = x2bytes.FloatToBytes(*b, f)
 	return b
 }
 
 // WriteBool writes boolean value to the buffer.
-func (b *ChainBuf) WriteBool(v bool) *ChainBuf {
+func (b *Chain) WriteBool(v bool) *Chain {
 	*b, _ = x2bytes.BoolToBytes(*b, v)
 	return b
 }
 
 // WriteX write x with arbitrary type to the buffer.
-func (b *ChainBuf) WriteX(x interface{}) *ChainBuf {
+func (b *Chain) WriteX(x interface{}) *Chain {
 	*b, _ = x2bytes.ToBytes(*b, x)
 	return b
 }
 
 // WriteMarshallerTo marshal data of struct implemented MarshallerTo interface and write it to the buffer.
-func (b *ChainBuf) WriteMarshallerTo(m MarshallerTo) *ChainBuf {
+func (b *Chain) WriteMarshallerTo(m MarshallerTo) *Chain {
 	if m == nil {
 		return b
 	}
@@ -100,26 +100,26 @@ func (b *ChainBuf) WriteMarshallerTo(m MarshallerTo) *ChainBuf {
 }
 
 // WriteApplyFn applies fn to p and write result to the buffer.
-func (b *ChainBuf) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) *ChainBuf {
+func (b *Chain) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) *Chain {
 	*b = fn(*b, p)
 	return b
 }
 
 // WriteApplyFnStr applies fn to s and write result to the buffer.
 // DEPRECATED: use WriteApplyFnString() instead.
-func (b *ChainBuf) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *ChainBuf {
+func (b *Chain) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *Chain {
 	*b = fn(*b, fastconv.S2B(s))
 	return b
 }
 
 // WriteApplyFnString applies fn to s and write result to the buffer.
-func (b *ChainBuf) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *ChainBuf {
+func (b *Chain) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *Chain {
 	*b = fn(*b, fastconv.S2B(s))
 	return b
 }
 
 // Replace replaces old bytes to new in buffer.
-func (b *ChainBuf) Replace(old, new []byte, n int) *ChainBuf {
+func (b *Chain) Replace(old, new []byte, n int) *Chain {
 	if b.Len() == 0 || n == 0 {
 		return b
 	}
@@ -143,41 +143,41 @@ func (b *ChainBuf) Replace(old, new []byte, n int) *ChainBuf {
 
 // ReplaceStr replace old to new substrings in buffer.
 // DEPRECATED: use ReplaceString() instead.
-func (b *ChainBuf) ReplaceStr(old, new string, n int) *ChainBuf {
+func (b *Chain) ReplaceStr(old, new string, n int) *Chain {
 	return b.ReplaceString(old, new, n)
 }
 
 // ReplaceString replace old to new substrings in buffer.
-func (b *ChainBuf) ReplaceString(old, new string, n int) *ChainBuf {
+func (b *Chain) ReplaceString(old, new string, n int) *Chain {
 	return b.Replace(fastconv.S2B(old), fastconv.S2B(new), n)
 }
 
 // ReplaceAll replace all occurrences of old bytes to new in buffer.
-func (b *ChainBuf) ReplaceAll(old, new []byte) *ChainBuf {
+func (b *Chain) ReplaceAll(old, new []byte) *Chain {
 	return b.Replace(old, new, -1)
 }
 
 // ReplaceStrAll replaces all occurrences of old substrings to new in buffer.
 // DEPRECATED: use ReplaceStringAll() instead.
-func (b *ChainBuf) ReplaceStrAll(old, new string) *ChainBuf {
+func (b *Chain) ReplaceStrAll(old, new string) *Chain {
 	return b.ReplaceStringAll(old, new)
 }
 
 // ReplaceStringAll replaces all occurrences of old substrings to new in buffer.
-func (b *ChainBuf) ReplaceStringAll(old, new string) *ChainBuf {
+func (b *Chain) ReplaceStringAll(old, new string) *Chain {
 	return b.Replace(fastconv.S2B(old), fastconv.S2B(new), -1)
 }
 
-func (b *ChainBuf) Len() int {
+func (b *Chain) Len() int {
 	return len(*b)
 }
 
-func (b *ChainBuf) Cap() int {
+func (b *Chain) Cap() int {
 	return cap(*b)
 }
 
 // Grow increases length of the buffer.
-func (b *ChainBuf) Grow(newLen int) *ChainBuf {
+func (b *Chain) Grow(newLen int) *Chain {
 	if newLen <= 0 {
 		return b
 	}
@@ -198,11 +198,11 @@ func (b *ChainBuf) Grow(newLen int) *ChainBuf {
 // GrowDelta increases length of the buffer to actual length + delta.
 //
 // See Grow().
-func (b *ChainBuf) GrowDelta(delta int) *ChainBuf {
+func (b *Chain) GrowDelta(delta int) *Chain {
 	return b.Grow(b.Len() + delta)
 }
 
-func (b *ChainBuf) Reset() *ChainBuf {
+func (b *Chain) Reset() *Chain {
 	*b = (*b)[:0]
 	return b
 }

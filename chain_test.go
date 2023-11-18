@@ -9,9 +9,9 @@ import (
 	"github.com/koykov/fastconv"
 )
 
-func TestChainBuf(t *testing.T) {
+func TestChain(t *testing.T) {
 	t.Run("cb write", func(t *testing.T) {
-		cb := &ChainBuf{}
+		cb := &Chain{}
 		cb.Write(stage.b).WriteByte('-').
 			WriteString(stage.s).WriteByte('-').
 			WriteInt(stage.i).WriteByte('-').
@@ -19,11 +19,11 @@ func TestChainBuf(t *testing.T) {
 			WriteFloat(stage.f)
 
 		if !bytes.Equal(cb.Bytes(), expectWS) {
-			t.Error("ChainBuf.Write*: mismatch result and expectation")
+			t.Error("Chain.Write*: mismatch result and expectation")
 		}
 	})
 	t.Run("apply fn", func(t *testing.T) {
-		cb := &ChainBuf{}
+		cb := &Chain{}
 		cb.WriteString("foo").
 			WriteApplyFnString("?q=front&p=1", func(dst, p []byte) []byte {
 				p1 := url.QueryEscape(fastconv.B2S(p))
@@ -32,14 +32,14 @@ func TestChainBuf(t *testing.T) {
 			}).
 			WriteString("bar")
 		if cb.String() != "foo%3Fq%3Dfront%26p%3D1bar" {
-			t.Error("ChainBuf.WriteApplyFn*: mismatch result and expectation")
+			t.Error("Chain.WriteApplyFn*: mismatch result and expectation")
 		}
 	})
 }
 
-func BenchmarkChainBuf(b *testing.B) {
+func BenchmarkChain(b *testing.B) {
 	b.Run("cb write", func(b *testing.B) {
-		cb := &ChainBuf{}
+		cb := &Chain{}
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			cb.Reset().
@@ -50,7 +50,7 @@ func BenchmarkChainBuf(b *testing.B) {
 				WriteFloat(stage.f)
 
 			if !bytes.Equal(cb.Bytes(), expectWS) {
-				b.Error("ChainBuf.Write*: mismatch result and expectation")
+				b.Error("Chain.Write*: mismatch result and expectation")
 			}
 		}
 	})

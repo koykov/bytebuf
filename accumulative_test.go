@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func TestAccumulativeBuf(t *testing.T) {
+func TestAccumulative(t *testing.T) {
 	t.Run("ab write", func(t *testing.T) {
-		ab := &AccumulativeBuf{}
+		ab := &Accumulative{}
 		ab.WriteString("foobar").
 			StakeOut().
 			Write(stage.b).WriteByte('-').
@@ -17,14 +17,14 @@ func TestAccumulativeBuf(t *testing.T) {
 			WriteFloat(stage.f)
 
 		if !bytes.Equal(ab.StakedBytes(), expectWS) {
-			t.Error("AccumulativeBuf.Write*: mismatch result and expectation")
+			t.Error("Accumulative.Write*: mismatch result and expectation")
 		}
 	})
 }
 
-func BenchmarkAccumulativeBuf(b *testing.B) {
+func BenchmarkAccumulative(b *testing.B) {
 	b.Run("ab write", func(b *testing.B) {
-		ab := &AccumulativeBuf{}
+		ab := &Accumulative{}
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			ab.Reset().
@@ -37,7 +37,7 @@ func BenchmarkAccumulativeBuf(b *testing.B) {
 				WriteFloat(stage.f)
 
 			if !bytes.Equal(ab.StakedBytes(), expectWS) {
-				b.Error("AccumulativeBuf.Write*: mismatch result and expectation")
+				b.Error("Accumulative.Write*: mismatch result and expectation")
 			}
 		}
 	})
