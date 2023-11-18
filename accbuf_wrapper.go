@@ -39,8 +39,14 @@ func (b *AccumulativeBuf) WriteByte(p byte) *AccumulativeBuf {
 }
 
 // WriteStr writes string to the buffer.
+// DEPRECATED: use WriteString() instead.
 func (b *AccumulativeBuf) WriteStr(s string) *AccumulativeBuf {
-	b.buf.WriteStr(s)
+	return b.WriteString(s)
+}
+
+// WriteString writes string to the buffer.
+func (b *AccumulativeBuf) WriteString(s string) *AccumulativeBuf {
+	b.buf.WriteString(s)
 	return b
 }
 
@@ -93,8 +99,14 @@ func (b *AccumulativeBuf) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) 
 }
 
 // WriteApplyFnStr applies fn to s and write result to the buffer.
+// DEPRECATED: use WriteApplyFnString() instead.
 func (b *AccumulativeBuf) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *AccumulativeBuf {
-	b.buf.WriteApplyFnStr(s, fn)
+	return b.WriteApplyFnString(s, fn)
+}
+
+// WriteApplyFnString applies fn to s and write result to the buffer.
+func (b *AccumulativeBuf) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *AccumulativeBuf {
+	b.buf.WriteApplyFnString(s, fn)
 	return b
 }
 
@@ -105,8 +117,14 @@ func (b *AccumulativeBuf) Replace(old, new []byte, n int) *AccumulativeBuf {
 }
 
 // ReplaceStr replace old to new substrings in buffer.
+// DEPRECATED: use ReplaceString() instead.
 func (b *AccumulativeBuf) ReplaceStr(old, new string, n int) *AccumulativeBuf {
-	b.buf.ReplaceStr(old, new, n)
+	return b.ReplaceString(old, new, n)
+}
+
+// ReplaceString replace old to new substrings in buffer.
+func (b *AccumulativeBuf) ReplaceString(old, new string, n int) *AccumulativeBuf {
+	b.buf.ReplaceString(old, new, n)
 	return b
 }
 
@@ -117,8 +135,14 @@ func (b *AccumulativeBuf) ReplaceAll(old, new []byte) *AccumulativeBuf {
 }
 
 // ReplaceStrAll replaces all occurrences of old substrings to new in buffer.
+// DEPRECATED: use ReplaceStringAll() instead.
 func (b *AccumulativeBuf) ReplaceStrAll(old, new string) *AccumulativeBuf {
-	b.buf.ReplaceStrAll(old, new)
+	return b.ReplaceStringAll(old, new)
+}
+
+// ReplaceStringAll replaces all occurrences of old substrings to new in buffer.
+func (b *AccumulativeBuf) ReplaceStringAll(old, new string) *AccumulativeBuf {
+	b.buf.ReplaceStringAll(old, new)
 	return b
 }
 

@@ -8,10 +8,10 @@ import (
 func TestAccumulativeBuf(t *testing.T) {
 	t.Run("ab write", func(t *testing.T) {
 		ab := &AccumulativeBuf{}
-		ab.WriteStr("foobar").
+		ab.WriteString("foobar").
 			StakeOut().
 			Write(stage.b).WriteByte('-').
-			WriteStr(stage.s).WriteByte('-').
+			WriteString(stage.s).WriteByte('-').
 			WriteInt(stage.i).WriteByte('-').
 			WriteUint(stage.u).WriteByte('-').
 			WriteFloat(stage.f)
@@ -28,10 +28,10 @@ func BenchmarkAccumulativeBuf(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			ab.Reset().
-				WriteStr("foobar").
+				WriteString("foobar").
 				StakeOut().
 				Write(stage.b).WriteByte('-').
-				WriteStr(stage.s).WriteByte('-').
+				WriteString(stage.s).WriteByte('-').
 				WriteInt(stage.i).WriteByte('-').
 				WriteUint(stage.u).WriteByte('-').
 				WriteFloat(stage.f)

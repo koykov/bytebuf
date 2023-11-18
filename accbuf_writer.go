@@ -1,6 +1,6 @@
 package bytebuf
 
-// AccBufWriter is a wrapper around AccBuf that implements io.Writer.
+// AccBufWriter is a wrapper around AccBuf that implements IO writers interfaces.
 type AccBufWriter struct {
 	AccBuf *AccumulativeBuf
 }
@@ -16,6 +16,6 @@ func (b AccBufWriter) WriteByte(p byte) error {
 }
 
 func (b AccBufWriter) WriteString(s string) (int, error) {
-	b.AccBuf.WriteStr(s)
+	b.AccBuf.WriteString(s)
 	return len(s), nil
 }

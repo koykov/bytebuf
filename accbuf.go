@@ -86,3 +86,8 @@ func (b *AccumulativeBuf) RangeStringCopy(off, len int) string {
 func (b *AccumulativeBuf) Error() error {
 	return b.err
 }
+
+// ToWriter wraps buffer with class implementing IO interfaces.
+func (b *AccumulativeBuf) ToWriter() *AccBufWriter {
+	return &AccBufWriter{AccBuf: b}
+}

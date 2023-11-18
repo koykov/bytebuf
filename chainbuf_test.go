@@ -13,7 +13,7 @@ func TestChainBuf(t *testing.T) {
 	t.Run("cb write", func(t *testing.T) {
 		cb := &ChainBuf{}
 		cb.Write(stage.b).WriteByte('-').
-			WriteStr(stage.s).WriteByte('-').
+			WriteString(stage.s).WriteByte('-').
 			WriteInt(stage.i).WriteByte('-').
 			WriteUint(stage.u).WriteByte('-').
 			WriteFloat(stage.f)
@@ -24,13 +24,13 @@ func TestChainBuf(t *testing.T) {
 	})
 	t.Run("apply fn", func(t *testing.T) {
 		cb := &ChainBuf{}
-		cb.WriteStr("foo").
-			WriteApplyFnStr("?q=front&p=1", func(dst, p []byte) []byte {
+		cb.WriteString("foo").
+			WriteApplyFnString("?q=front&p=1", func(dst, p []byte) []byte {
 				p1 := url.QueryEscape(fastconv.B2S(p))
 				dst = append(dst, p1...)
 				return dst
 			}).
-			WriteStr("bar")
+			WriteString("bar")
 		if cb.String() != "foo%3Fq%3Dfront%26p%3D1bar" {
 			t.Error("ChainBuf.WriteApplyFn*: mismatch result and expectation")
 		}
@@ -44,7 +44,7 @@ func BenchmarkChainBuf(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			cb.Reset().
 				Write(stage.b).WriteByte('-').
-				WriteStr(stage.s).WriteByte('-').
+				WriteString(stage.s).WriteByte('-').
 				WriteInt(stage.i).WriteByte('-').
 				WriteUint(stage.u).WriteByte('-').
 				WriteFloat(stage.f)
