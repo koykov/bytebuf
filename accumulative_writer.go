@@ -1,21 +1,21 @@
 package bytebuf
 
-// AccBufWriter is a wrapper around AccBuf that implements IO writers interfaces.
-type AccBufWriter struct {
-	AccBuf *Accumulative
+// AccumulativeWriter is a wrapper around Accumulative that implements IO writers interfaces.
+type AccumulativeWriter struct {
+	buf *Accumulative
 }
 
-func (b AccBufWriter) Write(p []byte) (int, error) {
-	b.AccBuf.Write(p)
+func (b AccumulativeWriter) Write(p []byte) (int, error) {
+	b.buf.Write(p)
 	return len(p), nil
 }
 
-func (b AccBufWriter) WriteByte(p byte) error {
-	b.AccBuf.WriteByte(p)
+func (b AccumulativeWriter) WriteByte(p byte) error {
+	b.buf.WriteByte(p)
 	return nil
 }
 
-func (b AccBufWriter) WriteString(s string) (int, error) {
-	b.AccBuf.WriteString(s)
+func (b AccumulativeWriter) WriteString(s string) (int, error) {
+	b.buf.WriteString(s)
 	return len(s), nil
 }
