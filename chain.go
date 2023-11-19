@@ -5,7 +5,7 @@ import (
 	"unsafe"
 
 	"github.com/koykov/bytealg"
-	"github.com/koykov/fastconv"
+	"github.com/koykov/byteconv"
 	"github.com/koykov/x2bytes"
 )
 
@@ -24,12 +24,12 @@ func (b *Chain) BytesCopy() []byte {
 
 // Get contents of the buffer as string.
 func (b *Chain) String() string {
-	return fastconv.B2S(*b)
+	return byteconv.B2S(*b)
 }
 
 // StringCopy returns copy of the buffer contents as string.
 func (b *Chain) StringCopy() string {
-	return bytealg.Copy[string](fastconv.B2S(*b))
+	return bytealg.Copy[string](byteconv.B2S(*b))
 }
 
 // Write bytes to the buffer.
@@ -108,13 +108,13 @@ func (b *Chain) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) *Chain {
 // WriteApplyFnStr applies fn to s and write result to the buffer.
 // DEPRECATED: use WriteApplyFnString() instead.
 func (b *Chain) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *Chain {
-	*b = fn(*b, fastconv.S2B(s))
+	*b = fn(*b, byteconv.S2B(s))
 	return b
 }
 
 // WriteApplyFnString applies fn to s and write result to the buffer.
 func (b *Chain) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *Chain {
-	*b = fn(*b, fastconv.S2B(s))
+	*b = fn(*b, byteconv.S2B(s))
 	return b
 }
 
@@ -149,7 +149,7 @@ func (b *Chain) ReplaceStr(old, new string, n int) *Chain {
 
 // ReplaceString replace old to new substrings in buffer.
 func (b *Chain) ReplaceString(old, new string, n int) *Chain {
-	return b.Replace(fastconv.S2B(old), fastconv.S2B(new), n)
+	return b.Replace(byteconv.S2B(old), byteconv.S2B(new), n)
 }
 
 // ReplaceAll replace all occurrences of old bytes to new in buffer.
@@ -165,7 +165,7 @@ func (b *Chain) ReplaceStrAll(old, new string) *Chain {
 
 // ReplaceStringAll replaces all occurrences of old substrings to new in buffer.
 func (b *Chain) ReplaceStringAll(old, new string) *Chain {
-	return b.Replace(fastconv.S2B(old), fastconv.S2B(new), -1)
+	return b.Replace(byteconv.S2B(old), byteconv.S2B(new), -1)
 }
 
 func (b *Chain) Len() int {
