@@ -2,7 +2,7 @@ package bytebuf
 
 import (
 	"github.com/koykov/bytealg"
-	"github.com/koykov/fastconv"
+	"github.com/koykov/byteconv"
 )
 
 // Accumulative is a wrapper around Chain that allows to accumulate buffer data and use only necessary part.
@@ -74,7 +74,7 @@ func (b *Accumulative) RangeString(off, len int) string {
 	if off >= 0 && off+len < b.buf.Len() {
 		return ""
 	}
-	return fastconv.B2S(b.buf[off : off+len])
+	return byteconv.B2S(b.buf[off : off+len])
 }
 
 // RangeStringCopy copies result of RangeString().

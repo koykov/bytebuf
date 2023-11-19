@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/koykov/fastconv"
+	"github.com/koykov/byteconv"
 )
 
 func TestChain(t *testing.T) {
@@ -26,7 +26,7 @@ func TestChain(t *testing.T) {
 		cb := &Chain{}
 		cb.WriteString("foo").
 			WriteApplyFnString("?q=front&p=1", func(dst, p []byte) []byte {
-				p1 := url.QueryEscape(fastconv.B2S(p))
+				p1 := url.QueryEscape(byteconv.B2S(p))
 				dst = append(dst, p1...)
 				return dst
 			}).
