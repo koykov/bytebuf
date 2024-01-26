@@ -75,7 +75,7 @@ func (b *Accumulative) WriteBool(v bool) *Accumulative {
 }
 
 // WriteX write v with arbitrary type to the buffer.
-func (b *Accumulative) WriteX(x interface{}) *Accumulative {
+func (b *Accumulative) WriteX(x any) *Accumulative {
 	b.buf, b.err = x2bytes.ToBytes(b.buf, x)
 	return b
 }
