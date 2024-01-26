@@ -8,7 +8,7 @@ func init() {
 }
 
 // ChainToBytes registers x2bytes conversion function accepts Chain.
-func ChainToBytes(dst []byte, val interface{}) ([]byte, error) {
+func ChainToBytes(dst []byte, val any) ([]byte, error) {
 	if b, ok := val.(*Chain); ok {
 		dst = append(dst, *b...)
 		return dst, nil
@@ -17,7 +17,7 @@ func ChainToBytes(dst []byte, val interface{}) ([]byte, error) {
 }
 
 // AccumulativeToBytes registers x2bytes conversion function accepts Accumulative.
-func AccumulativeToBytes(dst []byte, val interface{}) ([]byte, error) {
+func AccumulativeToBytes(dst []byte, val any) ([]byte, error) {
 	if b, ok := val.(*Accumulative); ok {
 		dst = append(dst, b.Bytes()...)
 		return dst, nil
