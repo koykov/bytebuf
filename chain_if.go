@@ -1,5 +1,7 @@
 package bytebuf
 
+// Contains conditional write methods.
+
 func (b *Chain) WriteIf(cond bool, p []byte) *Chain {
 	if cond {
 		b.Write(p)

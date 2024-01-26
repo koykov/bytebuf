@@ -1,5 +1,7 @@
 package bytebuf
 
+// Contains conditional write methods.
+
 func (b *Accumulative) WriteIf(cond bool, p []byte) *Accumulative {
 	if cond {
 		b.Write(p)
