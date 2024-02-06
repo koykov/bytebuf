@@ -12,6 +12,21 @@ import (
 // Chain is a primitive byte buffer with chain call support.
 type Chain []byte
 
+// NewChain creates and initializes a new chain buffer instance using buf as its initial contents.
+func NewChain(buf []byte) *Chain {
+	cb := Chain(buf)
+	return &cb
+}
+
+// NewChainSize creates new chain buffer and initializes byte slice as an internal buffer.
+func NewChainSize(size int) *Chain {
+	if size < 0 {
+		return nil
+	}
+	buf := make([]byte, 0, size)
+	return NewChain(buf)
+}
+
 // Bytes returns contents of the buffer.
 func (b *Chain) Bytes() []byte {
 	return *b

@@ -14,6 +14,21 @@ type Accumulative struct {
 	err error
 }
 
+// NewAccumulative creates and initializes a new accumulative buffer instance using buf as its initial contents.
+func NewAccumulative(buf []byte) *Accumulative {
+	ab := Accumulative{buf: Chain(buf)}
+	return &ab
+}
+
+// NewAccumulativeSize creates new accumulative buffer and initializes byte slice as an internal buffer.
+func NewAccumulativeSize(size int) *Accumulative {
+	if size < 0 {
+		return nil
+	}
+	buf := make([]byte, 0, size)
+	return NewAccumulative(buf)
+}
+
 // StakeOut saves current offset for further use.
 func (b *Accumulative) StakeOut() *Accumulative {
 	b.off = b.Len()

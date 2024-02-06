@@ -7,7 +7,7 @@ import (
 
 func TestWriteMarshallerTo(t *testing.T) {
 	t.Run("chain", func(t *testing.T) {
-		cb := &Chain{}
+		cb := NewAccumulativeSize(1024)
 		cb.WriteMarshallerTo(stage)
 		if !bytes.Equal(cb.Bytes(), expectMT) {
 			t.Error("Chain.WriteMarshallerTo: mismatch result and expectation")
@@ -24,7 +24,7 @@ func TestWriteMarshallerTo(t *testing.T) {
 
 func BenchmarkWriteMarshallerTo(b *testing.B) {
 	b.Run("chain", func(b *testing.B) {
-		cb := &Chain{}
+		cb := NewAccumulativeSize(1024)
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			cb.Reset().WriteMarshallerTo(stage)

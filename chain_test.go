@@ -11,7 +11,7 @@ import (
 
 func TestChain(t *testing.T) {
 	t.Run("write", func(t *testing.T) {
-		cb := &Chain{}
+		cb := NewChainSize(128)
 		cb.Write(stage.b).WriteByte('-').
 			WriteString(stage.s).WriteByte('-').
 			WriteInt(stage.i).WriteByte('-').
@@ -23,7 +23,7 @@ func TestChain(t *testing.T) {
 		}
 	})
 	t.Run("apply fn", func(t *testing.T) {
-		cb := &Chain{}
+		cb := NewChainSize(128)
 		cb.WriteString("foo").
 			WriteApplyFnString("?q=front&p=1", func(dst, p []byte) []byte {
 				p1 := url.QueryEscape(byteconv.B2S(p))
@@ -39,7 +39,7 @@ func TestChain(t *testing.T) {
 
 func BenchmarkChain(b *testing.B) {
 	b.Run("write", func(b *testing.B) {
-		cb := &Chain{}
+		cb := NewChainSize(128)
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			cb.Reset().
