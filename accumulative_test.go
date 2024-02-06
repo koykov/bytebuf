@@ -7,7 +7,7 @@ import (
 
 func TestAccumulative(t *testing.T) {
 	t.Run("write", func(t *testing.T) {
-		ab := &Accumulative{}
+		ab := NewAccumulativeSize(128)
 		ab.WriteString("foobar").
 			StakeOut().
 			Write(stage.b).WriteByte('-').
@@ -24,7 +24,7 @@ func TestAccumulative(t *testing.T) {
 
 func BenchmarkAccumulative(b *testing.B) {
 	b.Run("write", func(b *testing.B) {
-		ab := &Accumulative{}
+		ab := NewAccumulativeSize(128)
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			ab.Reset().
