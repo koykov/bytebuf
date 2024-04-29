@@ -30,7 +30,21 @@ func (b *Chain) WriteIntIf(cond bool, i int64) *Chain {
 	return b
 }
 
+func (b *Chain) WriteIntBaseIf(cond bool, i int64, base int) *Chain {
+	if cond {
+		b.WriteIntBase(i, base)
+	}
+	return b
+}
+
 func (b *Chain) WriteUintIf(cond bool, u uint64) *Chain {
+	if cond {
+		b.WriteUint(u)
+	}
+	return b
+}
+
+func (b *Chain) WriteUintBaseIf(cond bool, u uint64, base int) *Chain {
 	if cond {
 		b.WriteUint(u)
 	}
