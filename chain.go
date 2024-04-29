@@ -2,6 +2,7 @@ package bytebuf
 
 import (
 	"reflect"
+	"strconv"
 	"unsafe"
 
 	"github.com/koykov/bytealg"
@@ -78,9 +79,21 @@ func (b *Chain) WriteInt(i int64) *Chain {
 	return b
 }
 
+// WriteIntBase writes integer value in given base to the buffer.
+func (b *Chain) WriteIntBase(i int64, base int) *Chain {
+	*b = strconv.AppendInt(*b, i, base)
+	return b
+}
+
 // WriteUint writes unsigned integer value to the buffer.
 func (b *Chain) WriteUint(u uint64) *Chain {
 	*b, _ = x2bytes.UintToBytes(*b, u)
+	return b
+}
+
+// WriteUintBase writes unsigned integer value in given base to the buffer.
+func (b *Chain) WriteUintBase(u uint64, base int) *Chain {
+	*b = strconv.AppendUint(*b, u, base)
 	return b
 }
 

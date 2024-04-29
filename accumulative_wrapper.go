@@ -1,6 +1,8 @@
 package bytebuf
 
 import (
+	"strconv"
+
 	"github.com/koykov/x2bytes"
 )
 
@@ -56,9 +58,21 @@ func (b *Accumulative) WriteInt(i int64) *Accumulative {
 	return b
 }
 
+// WriteIntBase writes integer value in given base to the buffer.
+func (b *Accumulative) WriteIntBase(i int64, base int) *Accumulative {
+	b.buf = strconv.AppendInt(b.buf, i, base)
+	return b
+}
+
 // WriteUint writes unsigned integer value to the buffer.
 func (b *Accumulative) WriteUint(u uint64) *Accumulative {
 	b.buf, b.err = x2bytes.UintToBytes(b.buf, u)
+	return b
+}
+
+// WriteUintBase writes unsigned integer value in given base to the buffer.
+func (b *Accumulative) WriteUintBase(u uint64, base int) *Accumulative {
+	b.buf = strconv.AppendUint(b.buf, u, base)
 	return b
 }
 
