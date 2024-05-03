@@ -186,3 +186,8 @@ func (b *Accumulative) Reset() *Accumulative {
 	b.buf.Reset()
 	return b
 }
+
+func (b *Accumulative) Reduce(delta int) *Accumulative {
+	b.buf.Reduce(delta)
+	return b
+}
