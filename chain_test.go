@@ -35,6 +35,16 @@ func TestChain(t *testing.T) {
 			t.Error("Chain.WriteApplyFn*: mismatch result and expectation")
 		}
 	})
+	t.Run("reduce", func(t *testing.T) {
+		cb := Chain{}
+		cb.WriteString("0x0000").
+			WriteIntBase(100, 16)
+		hex := cb.Bytes()[cb.Len()-2:]
+		cb.Reduce(4).Write(hex)
+		if cb.String() != "0x0064" {
+			t.FailNow()
+		}
+	})
 }
 
 func BenchmarkChain(b *testing.B) {
@@ -71,6 +81,20 @@ func BenchmarkChain(b *testing.B) {
 
 			if !bytes.Equal(buf, expectWS) {
 				b.Error("ByteArray: mismatch result and expectation")
+			}
+		}
+	})
+	b.Run("reduce", func(b *testing.B) {
+		b.ReportAllocs()
+		cb := Chain{}
+		for i := 0; i < b.N; i++ {
+			cb.Reset()
+			cb.WriteString("0x0000").
+				WriteIntBase(100, 16)
+			hex := cb.Bytes()[cb.Len()-2:]
+			cb.Reduce(4).Write(hex)
+			if cb.String() != "0x0064" {
+				b.FailNow()
 			}
 		}
 	})

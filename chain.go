@@ -214,7 +214,7 @@ func (b *Chain) Grow(newLen int) *Chain {
 	if newLen < h.Cap {
 		// Just increase header's length if capacity allows
 		h.Len = newLen
-		// .. and restore the buffer from the header.
+		// ... and restore the buffer from the header.
 		*b = *(*[]byte)(unsafe.Pointer(&h))
 	} else {
 		// Append necessary space.
@@ -232,5 +232,17 @@ func (b *Chain) GrowDelta(delta int) *Chain {
 
 func (b *Chain) Reset() *Chain {
 	*b = (*b)[:0]
+	return b
+}
+
+// Reduce decreases buffer length to delta.
+func (b *Chain) Reduce(delta int) *Chain {
+	if delta <= 0 {
+		return b
+	}
+	if len(*b) < delta {
+		return b.Reset()
+	}
+	*b = (*b)[:len(*b)-delta]
 	return b
 }
