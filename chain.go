@@ -3,10 +3,12 @@ package bytebuf
 import (
 	"reflect"
 	"strconv"
+	"time"
 	"unsafe"
 
 	"github.com/koykov/bytealg"
 	"github.com/koykov/byteconv"
+	"github.com/koykov/clock"
 	"github.com/koykov/x2bytes"
 )
 
@@ -143,6 +145,12 @@ func (b *Chain) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *Chain 
 // WriteApplyFnString applies fn to s and write result to the buffer.
 func (b *Chain) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *Chain {
 	*b = fn(*b, byteconv.S2B(s))
+	return b
+}
+
+// WriteTime writes time t in given format to the buffer.
+func (b *Chain) WriteTime(format string, t time.Time) *Chain {
+	*b, _ = clock.AppendFormat(*b, format, t)
 	return b
 }
 

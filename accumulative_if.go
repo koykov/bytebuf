@@ -1,5 +1,7 @@
 package bytebuf
 
+import "time"
+
 // Contains conditional write methods.
 
 func (b *Accumulative) WriteIf(cond bool, p []byte) *Accumulative {
@@ -75,6 +77,13 @@ func (b *Accumulative) WriteApplyFnIf(cond bool, p []byte, fn func(dst, p []byte
 func (b *Accumulative) WriteApplyFnStringIf(cond bool, s string, fn func(dst, p []byte) []byte) *Accumulative {
 	if cond {
 		b.WriteApplyFnString(s, fn)
+	}
+	return b
+}
+
+func (b *Accumulative) WriteTimeIf(cond bool, format string, t time.Time) *Accumulative {
+	if cond {
+		b.WriteTime(format, t)
 	}
 	return b
 }
