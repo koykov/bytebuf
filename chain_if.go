@@ -1,5 +1,7 @@
 package bytebuf
 
+import "time"
+
 // Contains conditional write methods.
 
 func (b *Chain) WriteIf(cond bool, p []byte) *Chain {
@@ -89,6 +91,13 @@ func (b *Chain) WriteApplyFnIf(cond bool, p []byte, fn func(dst, p []byte) []byt
 func (b *Chain) WriteApplyFnStringIf(cond bool, s string, fn func(dst, p []byte) []byte) *Chain {
 	if cond {
 		b.WriteApplyFnString(s, fn)
+	}
+	return b
+}
+
+func (b *Chain) WriteTimeIf(cond bool, format string, t time.Time) *Chain {
+	if cond {
+		b.WriteTime(format, t)
 	}
 	return b
 }

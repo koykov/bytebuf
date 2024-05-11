@@ -2,7 +2,9 @@ package bytebuf
 
 import (
 	"strconv"
+	"time"
 
+	"github.com/koykov/clock"
 	"github.com/koykov/x2bytes"
 )
 
@@ -121,6 +123,12 @@ func (b *Accumulative) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) 
 // WriteApplyFnString applies fn to s and write result to the buffer.
 func (b *Accumulative) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *Accumulative {
 	b.buf.WriteApplyFnString(s, fn)
+	return b
+}
+
+// WriteTime writes time t in given format to the buffer.
+func (b *Accumulative) WriteTime(format string, t time.Time) *Accumulative {
+	b.buf, b.err = clock.AppendFormat(b.buf, format, t)
 	return b
 }
 
