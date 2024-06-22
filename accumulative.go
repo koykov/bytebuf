@@ -1,7 +1,6 @@
 package bytebuf
 
 import (
-	"github.com/koykov/bytealg"
 	"github.com/koykov/byteconv"
 )
 
@@ -55,7 +54,7 @@ func (b *Accumulative) StakedBytes() []byte {
 
 // StakedBytesCopy returns copy of accumulated bytes since staked offset.
 func (b *Accumulative) StakedBytesCopy() []byte {
-	return bytealg.Copy(b.StakedBytes())
+	return append([]byte(nil), b.StakedBytes()...)
 }
 
 // StakedString returns accumulated bytes as string.
@@ -68,7 +67,7 @@ func (b *Accumulative) StakedString() string {
 
 // StakedStringCopy returns copy of accumulated bytes as string.
 func (b *Accumulative) StakedStringCopy() string {
-	return bytealg.Copy[string](b.StakedString())
+	return byteconv.B2S(b.StakedBytesCopy())
 }
 
 // RangeBytes returns buffer bytes from offset off with length len.
@@ -81,7 +80,7 @@ func (b *Accumulative) RangeBytes(off, len int) []byte {
 
 // RangeBytesCopy copies result of RangeBytes().
 func (b *Accumulative) RangeBytesCopy(off, len int) []byte {
-	return bytealg.Copy(b.RangeBytes(off, len))
+	return append([]byte(nil), b.RangeBytes(off, len)...)
 }
 
 // RangeString returns buffer bytes as string from offset off with length len.
@@ -94,7 +93,7 @@ func (b *Accumulative) RangeString(off, len int) string {
 
 // RangeStringCopy copies result of RangeString().
 func (b *Accumulative) RangeStringCopy(off, len int) string {
-	return bytealg.Copy[string](b.RangeString(off, len))
+	return byteconv.B2S(b.RangeBytesCopy(off, len))
 }
 
 // Get last error caught in Write* methods.

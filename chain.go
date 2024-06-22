@@ -37,7 +37,7 @@ func (b *Chain) Bytes() []byte {
 
 // BytesCopy returns copy of the buffer.
 func (b *Chain) BytesCopy() []byte {
-	return bytealg.Copy(*b)
+	return append([]byte(nil), *b...)
 }
 
 // Get contents of the buffer as string.
@@ -47,7 +47,7 @@ func (b *Chain) String() string {
 
 // StringCopy returns copy of the buffer contents as string.
 func (b *Chain) StringCopy() string {
-	return bytealg.Copy[string](byteconv.B2S(*b))
+	return byteconv.B2S(b.BytesCopy())
 }
 
 // Write bytes to the buffer.
@@ -163,7 +163,7 @@ func (b *Chain) Replace(old, new []byte, n int) *Chain {
 	// Use the same byte buffer to make replacement and avoid alloc.
 	dst := (*b)[b.Len():]
 	for {
-		if i = bytealg.IndexAt(*b, old, at); i < 0 || c == n {
+		if i = bytealg.IndexAtBytes(*b, old, at); i < 0 || c == n {
 			dst = append(dst, (*b)[at:]...)
 			break
 		}
