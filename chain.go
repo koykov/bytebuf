@@ -135,6 +135,19 @@ func (b *Chain) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) *Chain {
 	return b
 }
 
+// WriteApplyFnN applies fn to p N times and write result to the buffer.
+func (b *Chain) WriteApplyFnN(p []byte, fn func(dst, p []byte) []byte, n int) *Chain {
+	off := b.Len()
+	var poff int
+	for i := 0; i < n; i++ {
+		poff = b.Len()
+		*b = fn(*b, p)
+		p = (*b)[poff:]
+	}
+	*b = append((*b)[:off], (*b)[poff:]...)
+	return b
+}
+
 // WriteApplyFnStr applies fn to s and write result to the buffer.
 // DEPRECATED: use WriteApplyFnString() instead.
 func (b *Chain) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *Chain {
@@ -146,6 +159,11 @@ func (b *Chain) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *Chain 
 func (b *Chain) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *Chain {
 	*b = fn(*b, byteconv.S2B(s))
 	return b
+}
+
+// WriteApplyFnNString applies fn to s N times and write result to the buffer.
+func (b *Chain) WriteApplyFnNString(s string, fn func(dst, p []byte) []byte, n int) *Chain {
+	return b.WriteApplyFnN(byteconv.S2B(s), fn, n)
 }
 
 // WriteTime writes time t in given format to the buffer.

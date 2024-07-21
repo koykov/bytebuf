@@ -70,9 +70,21 @@ func (b AccumulativeWriter) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte
 	return b.buf.Len() - off, nil
 }
 
+func (b AccumulativeWriter) WriteApplyFnN(p []byte, fn func(dst, p []byte) []byte, n int) (int, error) {
+	off := b.buf.Len()
+	b.buf.WriteApplyFnN(p, fn, n)
+	return b.buf.Len() - off, nil
+}
+
 func (b AccumulativeWriter) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) (int, error) {
 	off := b.buf.Len()
 	b.buf.WriteApplyFnString(s, fn)
+	return b.buf.Len() - off, nil
+}
+
+func (b AccumulativeWriter) WriteApplyFnNString(s string, fn func(dst, p []byte) []byte, n int) (int, error) {
+	off := b.buf.Len()
+	b.buf.WriteApplyFnNString(s, fn, n)
 	return b.buf.Len() - off, nil
 }
 

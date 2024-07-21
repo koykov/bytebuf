@@ -74,9 +74,23 @@ func (b *Accumulative) WriteApplyFnIf(cond bool, p []byte, fn func(dst, p []byte
 	return b
 }
 
+func (b *Accumulative) WriteApplyFnNIf(cond bool, p []byte, fn func(dst, p []byte) []byte, n int) *Accumulative {
+	if cond {
+		b.WriteApplyFnN(p, fn, n)
+	}
+	return b
+}
+
 func (b *Accumulative) WriteApplyFnStringIf(cond bool, s string, fn func(dst, p []byte) []byte) *Accumulative {
 	if cond {
 		b.WriteApplyFnString(s, fn)
+	}
+	return b
+}
+
+func (b *Accumulative) WriteApplyFnNStringIf(cond bool, s string, fn func(dst, p []byte) []byte, n int) *Accumulative {
+	if cond {
+		b.WriteApplyFnNString(s, fn, n)
 	}
 	return b
 }

@@ -35,6 +35,19 @@ func TestChain(t *testing.T) {
 			t.Error("Chain.WriteApplyFn*: mismatch result and expectation")
 		}
 	})
+	t.Run("apply fn N", func(t *testing.T) {
+		cb := NewChainSize(128)
+		cb.WriteString("foo").
+			WriteApplyFnNString("?q=front&p=1", func(dst, p []byte) []byte {
+				p1 := url.QueryEscape(byteconv.B2S(p))
+				dst = append(dst, p1...)
+				return dst
+			}, 3).
+			WriteString("bar")
+		if cb.String() != "foo%25253Fq%25253Dfront%252526p%25253D1bar" {
+			t.Error("Chain.WriteApplyFn*: mismatch result and expectation")
+		}
+	})
 	t.Run("reduce", func(t *testing.T) {
 		cb := Chain{}
 		cb.WriteString("0x0000").

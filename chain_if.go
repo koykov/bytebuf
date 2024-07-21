@@ -88,9 +88,23 @@ func (b *Chain) WriteApplyFnIf(cond bool, p []byte, fn func(dst, p []byte) []byt
 	return b
 }
 
+func (b *Chain) WriteApplyFnNIf(cond bool, p []byte, fn func(dst, p []byte) []byte, n int) *Chain {
+	if cond {
+		b.WriteApplyFnN(p, fn, n)
+	}
+	return b
+}
+
 func (b *Chain) WriteApplyFnStringIf(cond bool, s string, fn func(dst, p []byte) []byte) *Chain {
 	if cond {
 		b.WriteApplyFnString(s, fn)
+	}
+	return b
+}
+
+func (b *Chain) WriteApplyFnNStringIf(cond bool, s string, fn func(dst, p []byte) []byte, n int) *Chain {
+	if cond {
+		b.WriteApplyFnNString(s, fn, n)
 	}
 	return b
 }
