@@ -5,99 +5,71 @@ import "time"
 // Contains conditional write methods.
 
 func (b *Accumulative) WriteIf(cond bool, p []byte) *Accumulative {
-	if cond {
-		b.Write(p)
-	}
+	b.buf.WriteIf(cond, p)
 	return b
 }
 
 func (b *Accumulative) WriteByteIf(cond bool, p byte) *Accumulative {
-	if cond {
-		b.WriteByte(p)
-	}
+	b.buf.WriteByteIf(cond, p)
 	return b
 }
 
 func (b *Accumulative) WriteStringIf(cond bool, s string) *Accumulative {
-	if cond {
-		b.WriteString(s)
-	}
+	b.buf.WriteStringIf(cond, s)
 	return b
 }
 
 func (b *Accumulative) WriteIntIf(cond bool, i int64) *Accumulative {
-	if cond {
-		b.WriteInt(i)
-	}
+	b.buf.WriteIntIf(cond, i)
 	return b
 }
 
 func (b *Accumulative) WriteUintIf(cond bool, u uint64) *Accumulative {
-	if cond {
-		b.WriteUint(u)
-	}
+	b.buf.WriteUintIf(cond, u)
 	return b
 }
 
 func (b *Accumulative) WriteFloatIf(cond bool, f float64) *Accumulative {
-	if cond {
-		b.WriteFloat(f)
-	}
+	b.buf.WriteFloatIf(cond, f)
 	return b
 }
 
 func (b *Accumulative) WriteBoolIf(cond bool, v bool) *Accumulative {
-	if cond {
-		b.WriteBool(v)
-	}
+	b.buf.WriteBoolIf(cond, v)
 	return b
 }
 
 func (b *Accumulative) WriteXIf(cond bool, x any) *Accumulative {
-	if cond {
-		b.WriteX(x)
-	}
+	b.buf.WriteXIf(cond, x)
 	return b
 }
 
 func (b *Accumulative) WriteMarshallerToIf(cond bool, m MarshallerTo) *Accumulative {
-	if cond {
-		b.WriteMarshallerTo(m)
-	}
+	b.buf.WriteMarshallerToIf(cond, m)
 	return b
 }
 
 func (b *Accumulative) WriteApplyFnIf(cond bool, p []byte, fn func(dst, p []byte) []byte) *Accumulative {
-	if cond {
-		b.WriteApplyFn(p, fn)
-	}
+	b.buf.WriteApplyFnIf(cond, p, fn)
 	return b
 }
 
 func (b *Accumulative) WriteApplyFnNIf(cond bool, p []byte, fn func(dst, p []byte) []byte, n int) *Accumulative {
-	if cond {
-		b.WriteApplyFnN(p, fn, n)
-	}
+	b.buf.WriteApplyFnNIf(cond, p, fn, n)
 	return b
 }
 
 func (b *Accumulative) WriteApplyFnStringIf(cond bool, s string, fn func(dst, p []byte) []byte) *Accumulative {
-	if cond {
-		b.WriteApplyFnString(s, fn)
-	}
+	b.buf.WriteApplyFnStringIf(cond, s, fn)
 	return b
 }
 
 func (b *Accumulative) WriteApplyFnNStringIf(cond bool, s string, fn func(dst, p []byte) []byte, n int) *Accumulative {
-	if cond {
-		b.WriteApplyFnNString(s, fn, n)
-	}
+	b.buf.WriteApplyFnNStringIf(cond, s, fn, n)
 	return b
 }
 
 func (b *Accumulative) WriteTimeIf(cond bool, format string, t time.Time) *Accumulative {
-	if cond {
-		b.WriteTime(format, t)
-	}
+	b.buf.WriteTimeIf(cond, format, t)
 	return b
 }
