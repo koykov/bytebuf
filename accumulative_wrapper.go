@@ -114,6 +114,12 @@ func (b *Accumulative) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) *Ac
 	return b
 }
 
+// WriteApplyFnN applies fn to p N times and write result to the buffer.
+func (b *Accumulative) WriteApplyFnN(p []byte, fn func(dst, p []byte) []byte, n int) *Accumulative {
+	b.buf.WriteApplyFnN(p, fn, n)
+	return b
+}
+
 // WriteApplyFnStr applies fn to s and write result to the buffer.
 // DEPRECATED: use WriteApplyFnString() instead.
 func (b *Accumulative) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *Accumulative {
@@ -123,6 +129,12 @@ func (b *Accumulative) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) 
 // WriteApplyFnString applies fn to s and write result to the buffer.
 func (b *Accumulative) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *Accumulative {
 	b.buf.WriteApplyFnString(s, fn)
+	return b
+}
+
+// WriteApplyFnNString applies fn to s and write result to the buffer.
+func (b *Accumulative) WriteApplyFnNString(s string, fn func(dst, p []byte) []byte, n int) *Accumulative {
+	b.buf.WriteApplyFnNString(s, fn, n)
 	return b
 }
 
