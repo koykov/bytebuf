@@ -1,51 +1,51 @@
 package bytebuf
 
-func (b *Accumulative) WriteRepeat(p []byte, count int) *Accumulative {
-	b.buf.WriteRepeat(p, count)
+func (b *Accumulative) WriteN(p []byte, n int) *Accumulative {
+	b.buf.WriteN(p, n)
 	return b
 }
 
-func (b *Accumulative) WriteByteRepeat(p byte, count int) *Accumulative {
-	b.buf.WriteByteRepeat(p, count)
+func (b *Accumulative) WriteByteN(p byte, n int) *Accumulative {
+	b.buf.WriteByteN(p, n)
 	return b
 }
 
-func (b *Accumulative) WriteStringRepeat(s string, count int) *Accumulative {
-	b.buf.WriteStringRepeat(s, count)
+func (b *Accumulative) WriteStringN(s string, n int) *Accumulative {
+	b.buf.WriteStringN(s, n)
 	return b
 }
 
-func (b *Accumulative) WriteIntRepeat(i int64, count int) *Accumulative {
-	b.buf.WriteIntRepeat(i, count)
+func (b *Accumulative) WriteIntN(i int64, n int) *Accumulative {
+	b.buf.WriteIntN(i, n)
 	return b
 }
 
-func (b *Accumulative) WriteIntBaseRepeat(i int64, base, count int) *Accumulative {
-	b.buf.WriteIntBaseRepeat(i, base, count)
+func (b *Accumulative) WriteIntBaseN(i int64, base, n int) *Accumulative {
+	b.buf.WriteIntBaseN(i, base, n)
 	return b
 }
 
-func (b *Accumulative) WriteUintRepeat(u uint64, count int) *Accumulative {
-	b.buf.WriteUintRepeat(u, count)
+func (b *Accumulative) WriteUintN(u uint64, n int) *Accumulative {
+	b.buf.WriteUintN(u, n)
 	return b
 }
 
-func (b *Accumulative) WriteUintBaseRepeat(u uint64, base, count int) *Accumulative {
-	b.buf.WriteUintBaseRepeat(u, base, count)
+func (b *Accumulative) WriteUintBaseN(u uint64, base, n int) *Accumulative {
+	b.buf.WriteUintBaseN(u, base, n)
 	return b
 }
 
-func (b *Accumulative) WriteFloatRepeat(f float64, count int) *Accumulative {
-	b.buf.WriteFloatRepeat(f, count)
+func (b *Accumulative) WriteFloatN(f float64, n int) *Accumulative {
+	b.buf.WriteFloatN(f, n)
 	return b
 }
 
-func (b *Accumulative) WriteBoolRepeat(v bool, count int) *Accumulative {
-	b.buf.WriteBoolRepeat(v, count)
+func (b *Accumulative) WriteBoolN(v bool, n int) *Accumulative {
+	b.buf.WriteBoolN(v, n)
 	return b
 }
 
-func (b *Accumulative) WriteXRepeat(x any, count int) *Accumulative {
-	b.buf.WriteXRepeat(x, count)
+func (b *Accumulative) WriteXN(x any, n int) *Accumulative {
+	b.buf.WriteXN(x, n)
 	return b
 }
