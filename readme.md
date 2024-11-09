@@ -27,6 +27,9 @@ println(string(b)) // foobar@-1231233.1415true1.23456
 The same operations may be proceeded using `append()`/`AppendInt()`/... functions around `[]byte` slice, but `Chain`
 provides handy API for that.
 
+Chain buffer may be reused using internal pool. To get instance of the buffer from the pool call `AcquireChain` function.
+To put buffer back to the pool call `ReleaseChain` function.
+
 ## Accumulative buffer
 
 A wrapper around `Chain` buffer with "staked" features. The main idea is to accumulate (bufferize) various data and
@@ -52,3 +55,6 @@ println(string(chunk0)) // h�����,����?�ihttps
 println(string(chunk1)) // foobar@-1231233.1415true1.23456
 ```
 Thus, one buffer may be used to bufferize multiple data and hence reduce pointers in application.
+
+Accumulative buffer may be reused using internal pool. To get instance of the buffer from the pool call `AcquireAccumulative`
+function. To put buffer back to the pool call `ReleaseAccumulative` function.
