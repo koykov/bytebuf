@@ -1,7 +1,6 @@
 package bytebuf
 
 import (
-	"reflect"
 	"strconv"
 	"time"
 	"unsafe"
@@ -236,7 +235,7 @@ func (b *Chain) Grow(newLen int) *Chain {
 		return b
 	}
 	// Get buffer header.
-	h := *(*reflect.SliceHeader)(unsafe.Pointer(b))
+	h := *(*byteconv.SliceHeader)(unsafe.Pointer(b))
 	if newLen < h.Cap {
 		// Just increase header's length if capacity allows
 		h.Len = newLen
