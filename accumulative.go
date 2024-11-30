@@ -3,6 +3,7 @@ package bytebuf
 import (
 	"github.com/koykov/byteconv"
 	"github.com/koykov/byteptr"
+	"github.com/koykov/entry"
 )
 
 // Accumulative is a wrapper around Chain that allows to accumulate buffer data and use only necessary part.
@@ -74,6 +75,24 @@ func (b *Accumulative) StakedStringCopy() string {
 // StackedByteptr returns byteptr wrapper for stacked bytes.
 func (b *Accumulative) StackedByteptr() (p byteptr.Byteptr) {
 	p.Init(b.buf, b.off, b.Len()-b.off)
+	return
+}
+
+// StackedEntry16 returns Entry16 encoded lo/hi offsets of stacked bytes.
+func (b *Accumulative) StackedEntry16() (e entry.Entry16) {
+	e.Encode(uint8(b.off), uint8(b.Len()))
+	return
+}
+
+// StackedEntry32 returns Entry32 encoded lo/hi offsets of stacked bytes.
+func (b *Accumulative) StackedEntry32() (e entry.Entry32) {
+	e.Encode(uint16(b.off), uint16(b.Len()))
+	return
+}
+
+// StackedEntry64 returns Entry64 encoded lo/hi offsets of stacked bytes.
+func (b *Accumulative) StackedEntry64() (e entry.Entry64) {
+	e.Encode(uint32(b.off), uint32(b.Len()))
 	return
 }
 
