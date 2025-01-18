@@ -42,12 +42,6 @@ func (b *Accumulative) WriteByte(p byte) *Accumulative {
 	return b
 }
 
-// WriteStr writes string to the buffer.
-// DEPRECATED: use WriteString() instead.
-func (b *Accumulative) WriteStr(s string) *Accumulative {
-	return b.WriteString(s)
-}
-
 // WriteString writes string to the buffer.
 func (b *Accumulative) WriteString(s string) *Accumulative {
 	b.buf.WriteString(s)
@@ -120,12 +114,6 @@ func (b *Accumulative) WriteApplyFnN(p []byte, fn func(dst, p []byte) []byte, n 
 	return b
 }
 
-// WriteApplyFnStr applies fn to s and write result to the buffer.
-// DEPRECATED: use WriteApplyFnString() instead.
-func (b *Accumulative) WriteApplyFnStr(s string, fn func(dst, p []byte) []byte) *Accumulative {
-	return b.WriteApplyFnString(s, fn)
-}
-
 // WriteApplyFnString applies fn to s and write result to the buffer.
 func (b *Accumulative) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) *Accumulative {
 	b.buf.WriteApplyFnString(s, fn)
@@ -150,12 +138,6 @@ func (b *Accumulative) Replace(old, new []byte, n int) *Accumulative {
 	return b
 }
 
-// ReplaceStr replace old to new substrings in buffer.
-// DEPRECATED: use ReplaceString() instead.
-func (b *Accumulative) ReplaceStr(old, new string, n int) *Accumulative {
-	return b.ReplaceString(old, new, n)
-}
-
 // ReplaceString replace old to new substrings in buffer.
 func (b *Accumulative) ReplaceString(old, new string, n int) *Accumulative {
 	b.buf.ReplaceString(old, new, n)
@@ -166,12 +148,6 @@ func (b *Accumulative) ReplaceString(old, new string, n int) *Accumulative {
 func (b *Accumulative) ReplaceAll(old, new []byte) *Accumulative {
 	b.buf.ReplaceAll(old, new)
 	return b
-}
-
-// ReplaceStrAll replaces all occurrences of old substrings to new in buffer.
-// DEPRECATED: use ReplaceStringAll() instead.
-func (b *Accumulative) ReplaceStrAll(old, new string) *Accumulative {
-	return b.ReplaceStringAll(old, new)
 }
 
 // ReplaceStringAll replaces all occurrences of old substrings to new in buffer.
