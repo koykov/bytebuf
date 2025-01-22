@@ -3,6 +3,7 @@ package bytebuf
 import (
 	"strconv"
 	"time"
+	"unicode/utf8"
 	"unsafe"
 
 	"github.com/koykov/bytealg"
@@ -58,6 +59,12 @@ func (b *Chain) Write(p []byte) *Chain {
 // WriteByte writes single byte.
 func (b *Chain) WriteByte(p byte) *Chain {
 	*b = append(*b, p)
+	return b
+}
+
+// WriteRune writes rune to the buffer.
+func (b *Chain) WriteRune(r rune) *Chain {
+	*b = utf8.AppendRune(*b, r)
 	return b
 }
 
