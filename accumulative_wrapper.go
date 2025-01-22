@@ -42,6 +42,12 @@ func (b *Accumulative) WriteByte(p byte) *Accumulative {
 	return b
 }
 
+// WriteRune writes rune to the buffer.
+func (b *Accumulative) WriteRune(r rune) *Accumulative {
+	b.buf.WriteRune(r)
+	return b
+}
+
 // WriteString writes string to the buffer.
 func (b *Accumulative) WriteString(s string) *Accumulative {
 	b.buf.WriteString(s)
