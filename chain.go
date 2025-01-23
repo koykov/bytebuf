@@ -1,6 +1,7 @@
 package bytebuf
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 	"unicode/utf8"
@@ -107,6 +108,12 @@ func (b *Chain) WriteFloat(f float64) *Chain {
 // WriteBool writes boolean value to the buffer.
 func (b *Chain) WriteBool(v bool) *Chain {
 	*b, _ = x2bytes.BoolToBytes(*b, v)
+	return b
+}
+
+// WriteFormat writes formatted string to the buffer.
+func (b *Chain) WriteFormat(format string, args ...any) *Chain {
+	*b = fmt.Appendf(*b, format, args...)
 	return b
 }
 

@@ -58,6 +58,13 @@ func TestChain(t *testing.T) {
 			t.FailNow()
 		}
 	})
+	t.Run("format", func(t *testing.T) {
+		cb := Chain{}
+		cb.WriteFormat("int %d; float %f; string %s", 513, 3.1415, "foobar")
+		if cb.String() != "int 513; float 3.141500; string foobar" {
+			t.FailNow()
+		}
+	})
 }
 
 func BenchmarkChain(b *testing.B) {
@@ -109,6 +116,13 @@ func BenchmarkChain(b *testing.B) {
 			if cb.String() != "0x0064" {
 				b.FailNow()
 			}
+		}
+	})
+	b.Run("format", func(b *testing.B) {
+		b.ReportAllocs()
+		cb := Chain{}
+		for i := 0; i < b.N; i++ {
+			cb.Reset().WriteFormat("int %d; float %f; string %s", 513, 3.1415, "foobar")
 		}
 	})
 }

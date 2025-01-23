@@ -90,6 +90,12 @@ func (b *Accumulative) WriteBool(v bool) *Accumulative {
 	return b
 }
 
+// WriteFormat writes formatted string to the buffer.
+func (b *Accumulative) WriteFormat(format string, args ...any) *Accumulative {
+	b.buf.WriteFormat(format, args...)
+	return b
+}
+
 // WriteX write v with arbitrary type to the buffer.
 func (b *Accumulative) WriteX(x any) *Accumulative {
 	b.buf, b.err = x2bytes.ToBytes(b.buf, x)
