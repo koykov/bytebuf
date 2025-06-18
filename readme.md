@@ -59,3 +59,20 @@ Thus, one buffer may be used to bufferize multiple data and hence reduce pointer
 
 Accumulative buffer may be reused using internal pool. To get instance of the buffer from the pool call `AcquireAccumulative`
 function. To put buffer back to the pool call `ReleaseAccumulative` function.
+
+# Pools
+
+Both `Chain` and `Accumulative` buffers are using internal pools to reduce memory allocations.
+
+Usage:
+```go
+cbuf := bytebuf.AcquireChain()
+defer bytebuf.ReleaseChain(cbuf)
+cbuf.WriteString("foo")
+...
+
+abuf := bytebuf.AcquireAccumulative()
+defer bytebuf.ReleaseAccumulative(abuf)
+abuf.WriteString("foo")
+...
+```
