@@ -8,20 +8,19 @@ A wrapper around `[]byte` slice that supports chain write methods. Example of us
 ```go
 import "github.com/koykov/bytebuf"
 
-var (
-	buf bytebuf.Chain
-	msg protobuf.ExampleMessage
-)
+var buf bytebuf.Chain
 b := buf.Write([]byte("foo")).
-	WriteString("bar").
-	WriteByte('@').
-	WriteInt(-123).
-	WriteUint(123).
-	WriteFloat(3.1415).
-	WriteBool(true).
-	WriteX(1.23456).
-	Bytes()
-println(string(b)) // foobar@-1231233.1415true1.23456
+    WriteString("bar").
+    WriteByte('@').
+    WriteInt(-123).
+    WriteUint(123).
+    WriteFloat(3.1415).
+    WriteBool(true).
+    WriteRune('X').
+    WriteFormat("pre%dpost", 15)
+    WriteX(1.23456).
+    Bytes()
+println(string(b)) // foobar@-1231233.1415trueXpre15post1.23456
 ```
 
 The same operations may be proceeded using `append()`/`AppendInt()`/... functions around `[]byte` slice, but `Chain`
@@ -49,12 +48,31 @@ chunk1 := buf.StakeOut().Write([]byte("foo")).
     WriteUint(123).
     WriteFloat(3.1415).
     WriteBool(true).
+    WriteRune('X').
+    WriteFormat("pre%dpost", 15)
     WriteX(1.23456).
     StakedBytes()
 println(string(chunk0)) // h�����,����?�ihttps
-println(string(chunk1)) // foobar@-1231233.1415true1.23456
+println(string(chunk1)) // foobar@-1231233.1415trueXpre15post1.23456
 ```
 Thus, one buffer may be used to bufferize multiple data and hence reduce pointers in application.
 
 Accumulative buffer may be reused using internal pool. To get instance of the buffer from the pool call `AcquireAccumulative`
 function. To put buffer back to the pool call `ReleaseAccumulative` function.
+
+# Pools
+
+Both `Chain` and `Accumulative` buffers are using internal pools to reduce memory allocations.
+
+Usage:
+```go
+cbuf := bytebuf.AcquireChain()
+defer bytebuf.ReleaseChain(cbuf)
+cbuf.WriteString("foo")
+...
+
+abuf := bytebuf.AcquireAccumulative()
+defer bytebuf.ReleaseAccumulative(abuf)
+abuf.WriteString("foo")
+...
+```
