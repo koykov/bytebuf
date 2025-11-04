@@ -8,7 +8,7 @@ require (
 	github.com/koykov/byteptr v1.0.0
 	github.com/koykov/clock v1.1.6
 	github.com/koykov/entry v1.0.2
-	github.com/koykov/x2bytes v1.0.3
+	github.com/koykov/x2bytes v1.0.4
 )
 
 require github.com/koykov/byteseq v1.0.1 // indirect
