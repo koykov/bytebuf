@@ -259,3 +259,8 @@ func (b *Chain) Reduce(delta int) *Chain {
 	*b = (*b)[:len(*b)-delta]
 	return b
 }
+
+// ToWriter wraps buffer with class implementing IO interfaces.
+func (b *Chain) ToWriter() *ChainWriter {
+	return &ChainWriter{buf: b}
+}
