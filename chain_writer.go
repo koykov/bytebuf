@@ -2,6 +2,7 @@ package bytebuf
 
 import (
 	"encoding/binary"
+	"time"
 
 	"github.com/koykov/x2bytes"
 )
@@ -99,6 +100,24 @@ func (w ChainWriter) WriteApplyFnString(s string, fn func(dst, p []byte) []byte)
 func (w ChainWriter) WriteApplyFnNString(s string, fn func(dst, p []byte) []byte, n int) (int, error) {
 	off := w.buf.Len()
 	w.buf.WriteApplyFnNString(s, fn, n)
+	return w.buf.Len() - off, nil
+}
+
+func (w ChainWriter) WriteTime(format string, t time.Time) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteTime(format, t)
+	return w.buf.Len() - off, nil
+}
+
+func (w ChainWriter) WriteULEB128(v uint64) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteULEB128(v)
+	return w.buf.Len() - off, nil
+}
+
+func (w ChainWriter) WriteSLEB128(v int64) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteSLEB128(v)
 	return w.buf.Len() - off, nil
 }
 

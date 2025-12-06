@@ -125,3 +125,17 @@ func (b *Chain) WriteTimeIf(cond bool, format string, t time.Time) *Chain {
 	}
 	return b
 }
+
+func (b *Chain) WriteULEB128If(cond bool, v uint64) *Chain {
+	if cond {
+		b.WriteULEB128(v)
+	}
+	return b
+}
+
+func (b *Chain) WriteSLEB128If(cond bool, v int64) *Chain {
+	if cond {
+		b.WriteSLEB128(v)
+	}
+	return b
+}
