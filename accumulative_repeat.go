@@ -1,5 +1,7 @@
 package bytebuf
 
+import "encoding/binary"
+
 // WriteN writes p to buffer N times.
 // See Write.
 func (b *Accumulative) WriteN(p []byte, n int) *Accumulative {
@@ -60,6 +62,13 @@ func (b *Accumulative) WriteFloatN(f float64, n int) *Accumulative {
 // See WriteBool.
 func (b *Accumulative) WriteBoolN(v bool, n int) *Accumulative {
 	b.buf.WriteBoolN(v, n)
+	return b
+}
+
+// WriteBinaryN writes binary representation of x to buffer N times.
+// See WriteBinary.
+func (b *Accumulative) WriteBinaryN(order binary.ByteOrder, x any, n int) *Accumulative {
+	b.buf.WriteBinaryN(order, x, n)
 	return b
 }
 

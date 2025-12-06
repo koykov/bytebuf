@@ -1,6 +1,7 @@
 package bytebuf
 
 import (
+	"encoding/binary"
 	"strconv"
 	"time"
 
@@ -93,6 +94,12 @@ func (b *Accumulative) WriteBool(v bool) *Accumulative {
 // WriteFormat writes formatted string to the buffer.
 func (b *Accumulative) WriteFormat(format string, args ...any) *Accumulative {
 	b.buf.WriteFormat(format, args...)
+	return b
+}
+
+// WriteBinary writes binary representation of x with arbitrary type to the buffer in given byte order.
+func (b *Accumulative) WriteBinary(order binary.ByteOrder, x any) *Accumulative {
+	b.buf.WriteBinary(order, x)
 	return b
 }
 

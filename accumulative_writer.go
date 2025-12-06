@@ -1,101 +1,109 @@
 package bytebuf
 
+import "encoding/binary"
+
 // AccumulativeWriter is a wrapper around Accumulative that implements IO writers interfaces.
 type AccumulativeWriter struct {
 	buf *Accumulative
 }
 
-func (b AccumulativeWriter) Bytes() []byte {
-	return b.buf.Bytes()
+func (w AccumulativeWriter) Bytes() []byte {
+	return w.buf.Bytes()
 }
 
-func (b AccumulativeWriter) String() string {
-	return b.buf.String()
+func (w AccumulativeWriter) String() string {
+	return w.buf.String()
 }
 
-func (b AccumulativeWriter) Write(p []byte) (int, error) {
-	b.buf.Write(p)
+func (w AccumulativeWriter) Write(p []byte) (int, error) {
+	w.buf.Write(p)
 	return len(p), nil
 }
 
-func (b AccumulativeWriter) WriteByte(p byte) error {
-	b.buf.WriteByte(p)
+func (w AccumulativeWriter) WriteByte(b byte) error {
+	w.buf.WriteByte(b)
 	return nil
 }
 
-func (b AccumulativeWriter) WriteString(s string) (int, error) {
-	b.buf.WriteString(s)
+func (w AccumulativeWriter) WriteString(s string) (int, error) {
+	w.buf.WriteString(s)
 	return len(s), nil
 }
 
-func (b AccumulativeWriter) WriteInt(i int64) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteInt(i)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteInt(i int64) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteInt(i)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) WriteUint(u uint64) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteUint(u)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteUint(u uint64) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteUint(u)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) WriteFloat(f float64) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteFloat(f)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteFloat(f float64) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteFloat(f)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) WriteBool(b_ bool) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteBool(b_)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteBool(b bool) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteBool(b)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) WriteX(x any) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteX(x)
-	return b.buf.Len() - off, b.buf.Error()
+func (w AccumulativeWriter) WriteBinary(order binary.ByteOrder, x any) (int, error) {
+	off := w.buf.Len()
+	err := binary.Write(w, order, x)
+	return w.buf.Len() - off, err
 }
 
-func (b AccumulativeWriter) WriteMarshallerTo(m MarshallerTo) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteMarshallerTo(m)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteX(x any) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteX(x)
+	return w.buf.Len() - off, w.buf.Error()
 }
 
-func (b AccumulativeWriter) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteApplyFn(p, fn)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteMarshallerTo(m MarshallerTo) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteMarshallerTo(m)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) WriteApplyFnN(p []byte, fn func(dst, p []byte) []byte, n int) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteApplyFnN(p, fn, n)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteApplyFn(p, fn)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteApplyFnString(s, fn)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteApplyFnN(p []byte, fn func(dst, p []byte) []byte, n int) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteApplyFnN(p, fn, n)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) WriteApplyFnNString(s string, fn func(dst, p []byte) []byte, n int) (int, error) {
-	off := b.buf.Len()
-	b.buf.WriteApplyFnNString(s, fn, n)
-	return b.buf.Len() - off, nil
+func (w AccumulativeWriter) WriteApplyFnString(s string, fn func(dst, p []byte) []byte) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteApplyFnString(s, fn)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) Len() int {
-	return b.buf.Len()
+func (w AccumulativeWriter) WriteApplyFnNString(s string, fn func(dst, p []byte) []byte, n int) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteApplyFnNString(s, fn, n)
+	return w.buf.Len() - off, nil
 }
 
-func (b AccumulativeWriter) Cap() int {
-	return b.buf.Cap()
+func (w AccumulativeWriter) Len() int {
+	return w.buf.Len()
 }
 
-func (b AccumulativeWriter) Reset() {
-	b.buf.Reset()
+func (w AccumulativeWriter) Cap() int {
+	return w.buf.Cap()
+}
+
+func (w AccumulativeWriter) Reset() {
+	w.buf.Reset()
 }

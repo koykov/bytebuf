@@ -1,5 +1,7 @@
 package bytebuf
 
+import "encoding/binary"
+
 // WriteN writes p to buffer N times.
 // See Write.
 func (b *Chain) WriteN(p []byte, n int) *Chain {
@@ -77,6 +79,15 @@ func (b *Chain) WriteFloatN(f float64, n int) *Chain {
 func (b *Chain) WriteBoolN(v bool, n int) *Chain {
 	for i := 0; i < n; i++ {
 		b.WriteBool(v)
+	}
+	return b
+}
+
+// WriteBinaryN writes x to buffer N times.
+// See WriteBinary.
+func (b *Chain) WriteBinaryN(order binary.ByteOrder, x any, n int) *Chain {
+	for i := 0; i < n; i++ {
+		b.WriteBinary(order, x)
 	}
 	return b
 }

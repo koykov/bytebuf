@@ -1,6 +1,7 @@
 package bytebuf
 
 import (
+	"encoding/binary"
 	"fmt"
 	"strconv"
 	"time"
@@ -114,6 +115,13 @@ func (b *Chain) WriteBool(v bool) *Chain {
 // WriteFormat writes formatted string to the buffer.
 func (b *Chain) WriteFormat(format string, args ...any) *Chain {
 	*b = fmt.Appendf(*b, format, args...)
+	return b
+}
+
+// WriteBinary writes binary representation of x with arbitrary type to the buffer in given byte order.
+func (b *Chain) WriteBinary(order binary.ByteOrder, x any) *Chain {
+	w := ChainWriter{buf: b}
+	_ = binary.Write(&w, order, x)
 	return b
 }
 
@@ -258,4 +266,9 @@ func (b *Chain) Reduce(delta int) *Chain {
 	}
 	*b = (*b)[:len(*b)-delta]
 	return b
+}
+
+// ToWriter wraps buffer with class implementing IO interfaces.
+func (b *Chain) ToWriter() *ChainWriter {
+	return &ChainWriter{buf: b}
 }
