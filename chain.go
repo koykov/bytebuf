@@ -120,8 +120,8 @@ func (b *Chain) WriteFormat(format string, args ...any) *Chain {
 
 // WriteBinary writes binary representation of x with arbitrary type to the buffer in given byte order.
 func (b *Chain) WriteBinary(x any, order binary.ByteOrder) *Chain {
-	w := b.ToWriter()
-	_ = binary.Write(w, order, x)
+	w := ChainWriter{buf: b}
+	_ = binary.Write(&w, order, x)
 	return b
 }
 
