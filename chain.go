@@ -179,6 +179,39 @@ func (b *Chain) WriteTime(format string, t time.Time) *Chain {
 	return b
 }
 
+// WriteULEB128 writes unsigned LEB128 representation of uint64 value.
+func (b *Chain) WriteULEB128(v uint64) *Chain {
+	for {
+		c := uint8(v & 0x7F)
+		v >>= 7
+		if v != 0 {
+			c |= 0x80
+		}
+		b.WriteByte(c)
+		if v == 0 {
+			break
+		}
+	}
+	return b
+}
+
+// WriteSLEB128 writes signed LEB128 representation of int64 value.
+func (b *Chain) WriteSLEB128(v int64) *Chain {
+	for {
+		c := uint8(v & 0x7F)
+		v >>= 7
+		stop := (v == 0 && (c&0x40) == 0) || (v == -1 && (c&0x40) != 0)
+		if !stop {
+			c |= 0x80
+		}
+		b.WriteByte(c)
+		if stop {
+			break
+		}
+	}
+	return b
+}
+
 // Replace replaces old bytes to new in buffer.
 func (b *Chain) Replace(old, new []byte, n int) *Chain {
 	if b.Len() == 0 || n == 0 {

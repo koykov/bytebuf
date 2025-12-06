@@ -151,6 +151,16 @@ func (b *Accumulative) WriteTime(format string, t time.Time) *Accumulative {
 	return b
 }
 
+func (b *Accumulative) WriteULEB128(v uint64) *Accumulative {
+	b.buf.WriteULEB128(v)
+	return b
+}
+
+func (b *Accumulative) WriteSLEB128(v int64) *Accumulative {
+	b.buf.WriteSLEB128(v)
+	return b
+}
+
 // Replace replaces old bytes to new in buffer.
 func (b *Accumulative) Replace(old, new []byte, n int) *Accumulative {
 	b.buf.Replace(old, new, n)

@@ -1,6 +1,9 @@
 package bytebuf
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"time"
+)
 
 // WriteN writes p to buffer N times.
 // See Write.
@@ -76,5 +79,26 @@ func (b *Accumulative) WriteBinaryN(order binary.ByteOrder, x any, n int) *Accum
 // See WriteX.
 func (b *Accumulative) WriteXN(x any, n int) *Accumulative {
 	b.buf.WriteXN(x, n)
+	return b
+}
+
+func (b *Accumulative) WriteTimeN(format string, t time.Time, n int) *Accumulative {
+	for i := 0; i < n; i++ {
+		b.WriteTime(format, t)
+	}
+	return b
+}
+
+func (b *Accumulative) WriteULEB128N(v uint64, n int) *Accumulative {
+	for i := 0; i < n; i++ {
+		b.WriteULEB128(v)
+	}
+	return b
+}
+
+func (b *Accumulative) WriteSLEB128N(v int64, n int) *Accumulative {
+	for i := 0; i < n; i++ {
+		b.WriteSLEB128(v)
+	}
 	return b
 }

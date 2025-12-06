@@ -81,3 +81,13 @@ func (b *Accumulative) WriteTimeIf(cond bool, format string, t time.Time) *Accum
 	b.buf.WriteTimeIf(cond, format, t)
 	return b
 }
+
+func (b *Accumulative) WriteULEB128If(cond bool, v uint64) *Accumulative {
+	b.buf.WriteULEB128If(cond, v)
+	return b
+}
+
+func (b *Accumulative) WriteSLEB128If(cond bool, v int64) *Accumulative {
+	b.buf.WriteSLEB128If(cond, v)
+	return b
+}
