@@ -67,8 +67,8 @@ func (b *Accumulative) WriteBoolN(v bool, n int) *Accumulative {
 
 // WriteBinaryN writes binary representation of x to buffer N times.
 // See WriteBinary.
-func (b *Accumulative) WriteBinaryN(x any, order binary.ByteOrder, n int) *Accumulative {
-	b.buf.WriteBinaryN(x, order, n)
+func (b *Accumulative) WriteBinaryN(order binary.ByteOrder, x any, n int) *Accumulative {
+	b.buf.WriteBinaryN(order, x, n)
 	return b
 }
 

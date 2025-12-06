@@ -98,8 +98,8 @@ func (b *Accumulative) WriteFormat(format string, args ...any) *Accumulative {
 }
 
 // WriteBinary writes binary representation of x with arbitrary type to the buffer in given byte order.
-func (b *Accumulative) WriteBinary(x any, order binary.ByteOrder) *Accumulative {
-	b.buf.WriteBinary(x, order)
+func (b *Accumulative) WriteBinary(order binary.ByteOrder, x any) *Accumulative {
+	b.buf.WriteBinary(order, x)
 	return b
 }
 

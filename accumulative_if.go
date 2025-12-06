@@ -42,8 +42,8 @@ func (b *Accumulative) WriteBoolIf(cond bool, v bool) *Accumulative {
 	return b
 }
 
-func (b *Accumulative) WriteBinaryIf(cond bool, x any, order binary.ByteOrder) *Accumulative {
-	b.buf.WriteBinaryIf(cond, x, order)
+func (b *Accumulative) WriteBinaryIf(cond bool, order binary.ByteOrder, x any) *Accumulative {
+	b.buf.WriteBinaryIf(cond, order, x)
 	return b
 }
 

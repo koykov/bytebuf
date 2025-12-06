@@ -1,5 +1,7 @@
 package bytebuf
 
+import "encoding/binary"
+
 // AccumulativeWriter is a wrapper around Accumulative that implements IO writers interfaces.
 type AccumulativeWriter struct {
 	buf *Accumulative
@@ -50,6 +52,12 @@ func (w AccumulativeWriter) WriteBool(b bool) (int, error) {
 	off := w.buf.Len()
 	w.buf.WriteBool(b)
 	return w.buf.Len() - off, nil
+}
+
+func (w AccumulativeWriter) WriteBinary(order binary.ByteOrder, x any) (int, error) {
+	off := w.buf.Len()
+	err := binary.Write(w, order, x)
+	return w.buf.Len() - off, err
 }
 
 func (w AccumulativeWriter) WriteX(x any) (int, error) {
