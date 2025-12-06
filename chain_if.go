@@ -70,9 +70,9 @@ func (b *Chain) WriteBoolIf(cond bool, v bool) *Chain {
 	return b
 }
 
-func (b *Chain) WriteBinaryIf(cond bool, x any, order binary.ByteOrder) *Chain {
+func (b *Chain) WriteBinaryIf(cond bool, order binary.ByteOrder, x any) *Chain {
 	if cond {
-		b.WriteBinary(x, order)
+		b.WriteBinary(order, x)
 	}
 	return b
 }

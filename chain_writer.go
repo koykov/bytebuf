@@ -58,7 +58,7 @@ func (w ChainWriter) WriteBool(b bool) (int, error) {
 	return w.buf.Len() - off, nil
 }
 
-func (w ChainWriter) WriteBinary(x any, order binary.ByteOrder) (int, error) {
+func (w ChainWriter) WriteBinary(order binary.ByteOrder, x any) (int, error) {
 	off := w.buf.Len()
 	err := binary.Write(w, order, x)
 	return w.buf.Len() - off, err

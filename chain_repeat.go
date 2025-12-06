@@ -85,9 +85,9 @@ func (b *Chain) WriteBoolN(v bool, n int) *Chain {
 
 // WriteBinaryN writes x to buffer N times.
 // See WriteBinary.
-func (b *Chain) WriteBinaryN(x any, order binary.ByteOrder, n int) *Chain {
+func (b *Chain) WriteBinaryN(order binary.ByteOrder, x any, n int) *Chain {
 	for i := 0; i < n; i++ {
-		b.WriteBinary(x, order)
+		b.WriteBinary(order, x)
 	}
 	return b
 }
