@@ -1,6 +1,9 @@
 package bytebuf
 
-import "time"
+import (
+	"encoding/binary"
+	"time"
+)
 
 // Contains conditional write methods.
 
@@ -36,6 +39,11 @@ func (b *Accumulative) WriteFloatIf(cond bool, f float64) *Accumulative {
 
 func (b *Accumulative) WriteBoolIf(cond bool, v bool) *Accumulative {
 	b.buf.WriteBoolIf(cond, v)
+	return b
+}
+
+func (b *Accumulative) WriteBinaryIf(cond bool, x any, order binary.ByteOrder) *Accumulative {
+	b.buf.WriteBinaryIf(cond, x, order)
 	return b
 }
 
