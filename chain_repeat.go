@@ -104,6 +104,8 @@ func (b *Chain) WriteXN(x any, n int) *Chain {
 	return b
 }
 
+// WriteTimeN writes time in given format to buffer N times.
+// See WriteTime.
 func (b *Chain) WriteTimeN(format string, t time.Time, n int) *Chain {
 	for i := 0; i < n; i++ {
 		b.WriteTime(format, t)
@@ -111,6 +113,8 @@ func (b *Chain) WriteTimeN(format string, t time.Time, n int) *Chain {
 	return b
 }
 
+// WriteULEB128N writes unsigned LEB128 representation of uint64 value to buffer N times.
+// See WriteULEB128.
 func (b *Chain) WriteULEB128N(v uint64, n int) *Chain {
 	for i := 0; i < n; i++ {
 		b.WriteULEB128(v)
@@ -118,6 +122,8 @@ func (b *Chain) WriteULEB128N(v uint64, n int) *Chain {
 	return b
 }
 
+// WriteSLEB128N writes signed LEB128 representation of uint64 value to buffer N times.
+// See WriteSLEB128.
 func (b *Chain) WriteSLEB128N(v int64, n int) *Chain {
 	for i := 0; i < n; i++ {
 		b.WriteSLEB128(v)
