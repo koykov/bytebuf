@@ -82,6 +82,8 @@ func (b *Accumulative) WriteXN(x any, n int) *Accumulative {
 	return b
 }
 
+// WriteTimeN writes time in given format to buffer N times.
+// See WriteTime.
 func (b *Accumulative) WriteTimeN(format string, t time.Time, n int) *Accumulative {
 	for i := 0; i < n; i++ {
 		b.WriteTime(format, t)
@@ -89,6 +91,8 @@ func (b *Accumulative) WriteTimeN(format string, t time.Time, n int) *Accumulati
 	return b
 }
 
+// WriteULEB128N writes unsigned LEB128 representation of uint64 value to buffer N times.
+// See WriteULEB128.
 func (b *Accumulative) WriteULEB128N(v uint64, n int) *Accumulative {
 	for i := 0; i < n; i++ {
 		b.WriteULEB128(v)
@@ -96,6 +100,8 @@ func (b *Accumulative) WriteULEB128N(v uint64, n int) *Accumulative {
 	return b
 }
 
+// WriteSLEB128N writes signed LEB128 representation of uint64 value to buffer N times.
+// See WriteSLEB128.
 func (b *Accumulative) WriteSLEB128N(v int64, n int) *Accumulative {
 	for i := 0; i < n; i++ {
 		b.WriteSLEB128(v)

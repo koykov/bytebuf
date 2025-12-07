@@ -151,11 +151,13 @@ func (b *Accumulative) WriteTime(format string, t time.Time) *Accumulative {
 	return b
 }
 
+// WriteULEB128 writes unsigned LEB128 representation of uint64 value to the buffer.
 func (b *Accumulative) WriteULEB128(v uint64) *Accumulative {
 	b.buf.WriteULEB128(v)
 	return b
 }
 
+// WriteSLEB128 writes signed LEB128 representation of int64 value to the buffer.
 func (b *Accumulative) WriteSLEB128(v int64) *Accumulative {
 	b.buf.WriteSLEB128(v)
 	return b
