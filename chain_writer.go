@@ -132,3 +132,7 @@ func (w ChainWriter) Cap() int {
 func (w ChainWriter) Reset() {
 	w.buf.Reset()
 }
+
+func (w ChainWriter) ResetSafe() {
+	w.buf.ResetSafe()
+}

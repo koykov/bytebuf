@@ -11,6 +11,7 @@ import (
 	"github.com/koykov/bytealg"
 	"github.com/koykov/byteconv"
 	"github.com/koykov/clock"
+	"github.com/koykov/simd/memclr64"
 	"github.com/koykov/x2bytes"
 )
 
@@ -284,7 +285,15 @@ func (b *Chain) GrowDelta(delta int) *Chain {
 	return b.Grow(b.Len() + delta)
 }
 
+// Reset resets length of the buffer.
 func (b *Chain) Reset() *Chain {
+	*b = (*b)[:0]
+	return b
+}
+
+// ResetSafe cleans the buffer (zeroes it) and resets length of the buffer afterward.
+func (b *Chain) ResetSafe() *Chain {
+	memclr64.ClearBytes(*b)
 	*b = (*b)[:0]
 	return b
 }

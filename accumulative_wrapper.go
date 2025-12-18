@@ -214,6 +214,11 @@ func (b *Accumulative) Reset() *Accumulative {
 	return b
 }
 
+func (b *Accumulative) ResetSafe() *Accumulative {
+	b.buf.ResetSafe()
+	return b
+}
+
 func (b *Accumulative) Reduce(delta int) *Accumulative {
 	b.buf.Reduce(delta)
 	return b

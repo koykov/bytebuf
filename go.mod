@@ -8,7 +8,11 @@ require (
 	github.com/koykov/byteptr v1.0.0
 	github.com/koykov/clock v1.1.6
 	github.com/koykov/entry v1.0.2
+	github.com/koykov/simd v0.0.7
 	github.com/koykov/x2bytes v1.0.4
 )
 
-require github.com/koykov/byteseq v1.0.1 // indirect
+require (
+	github.com/koykov/byteseq v1.0.1 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+)
