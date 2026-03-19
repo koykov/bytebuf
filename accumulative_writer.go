@@ -10,6 +10,14 @@ type AccumulativeWriter struct {
 	buf *Accumulative
 }
 
+func (w AccumulativeWriter) Grow(newLen int) {
+	w.buf.Grow(newLen)
+}
+
+func (w AccumulativeWriter) GrowDelta(delta int) {
+	w.buf.GrowDelta(delta)
+}
+
 func (w AccumulativeWriter) Bytes() []byte {
 	return w.buf.Bytes()
 }

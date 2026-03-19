@@ -12,6 +12,14 @@ type ChainWriter struct {
 	buf *Chain
 }
 
+func (w ChainWriter) Grow(newLen int) {
+	w.buf.Grow(newLen)
+}
+
+func (w ChainWriter) GrowDelta(delta int) {
+	w.buf.GrowDelta(delta)
+}
+
 func (w ChainWriter) Bytes() []byte {
 	return w.buf.Bytes()
 }
