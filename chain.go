@@ -11,7 +11,7 @@ import (
 	"github.com/koykov/bytealg"
 	"github.com/koykov/byteconv"
 	"github.com/koykov/clock"
-	"github.com/koykov/simd/memclr64"
+	"github.com/koykov/simd/memclr"
 	"github.com/koykov/x2bytes"
 )
 
@@ -293,7 +293,7 @@ func (b *Chain) Reset() *Chain {
 
 // ResetSafe cleans the buffer (zeroes it) and resets length of the buffer afterward.
 func (b *Chain) ResetSafe() *Chain {
-	memclr64.ClearBytes(*b)
+	memclr.Clear(*b)
 	*b = (*b)[:0]
 	return b
 }
