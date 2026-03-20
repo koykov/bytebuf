@@ -4,19 +4,19 @@ import "io"
 
 type ChainReader struct {
 	buf *Chain
-	i   int64
+	off int64
 }
 
 func (cr *ChainReader) Read(p []byte) (n int, err error) {
-	if n = cr.buf.Len() - int(cr.i); n < len(p) {
-		copy(p, cr.buf.Bytes()[cr.i:])
+	if cr.off >= int64(cr.buf.Len()) {
 		err = io.EOF
-		cr.i += int64(n)
 		return
 	}
-	n = len(p)
-	copy(p, cr.buf.Bytes()[:n])
-	cr.i += int64(n)
+	n = copy(p, cr.buf.Bytes()[cr.off:])
+	cr.off += int64(n)
+	if n < len(p) {
+		err = io.EOF
+	}
 	return
 }
 
