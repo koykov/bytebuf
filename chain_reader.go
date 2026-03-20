@@ -1,6 +1,10 @@
 package bytebuf
 
-import "io"
+import (
+	"io"
+
+	"github.com/koykov/simd/memcpy"
+)
 
 type ChainReader struct {
 	buf *Chain
@@ -12,7 +16,8 @@ func (cr *ChainReader) Read(p []byte) (n int, err error) {
 		err = io.EOF
 		return
 	}
-	n = copy(p, cr.buf.Bytes()[cr.off:])
+	n = min(len(p), cr.buf.Len()-int(cr.off))
+	memcpy.Copy(p, cr.buf.Bytes()[cr.off:cr.off+int64(n)])
 	cr.off += int64(n)
 	if n < len(p) {
 		err = io.EOF
