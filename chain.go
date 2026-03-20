@@ -314,3 +314,7 @@ func (b *Chain) Reduce(delta int) *Chain {
 func (b *Chain) ToWriter() *ChainWriter {
 	return &ChainWriter{buf: b}
 }
+
+func (b *Chain) ToReader() *ChainReader {
+	return &ChainReader{buf: b}
+}
