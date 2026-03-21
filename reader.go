@@ -55,11 +55,6 @@ func (cr *reader) ReadAt(p []byte, off int64) (n int, err error) {
 	return
 }
 
-func (cr *reader) ReadFrom(r io.Reader) (n int64, err error) {
-	// todo implement me
-	return
-}
-
 func (cr *reader) ReadByte() (b byte, err error) {
 	if cr.off >= int64(len(cr.buf)) {
 		err = io.EOF
