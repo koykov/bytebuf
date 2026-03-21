@@ -315,6 +315,7 @@ func (b *Chain) ToWriter() *ChainWriter {
 	return &ChainWriter{buf: b}
 }
 
+// ToReader wraps buffer with class implementing IO interfaces.
 func (b *Chain) ToReader() Reader {
 	return &reader{buf: *b}
 }
