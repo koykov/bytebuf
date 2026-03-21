@@ -1,6 +1,7 @@
 package bytebuf
 
 import (
+	"errors"
 	"io"
 
 	"github.com/koykov/simd/memcpy"
@@ -26,7 +27,7 @@ func (cr *reader) Read(p []byte) (n int, err error) {
 		err = io.EOF
 		return
 	}
-	n = min(len(p), len(cr.buf)-int(cr.off))
+	n = cr.min(len(p), len(cr.buf)-int(cr.off))
 	memcpy.Copy(p, cr.buf[cr.off:cr.off+int64(n)])
 	cr.off += int64(n)
 	if n < len(p) {
@@ -36,7 +37,19 @@ func (cr *reader) Read(p []byte) (n int, err error) {
 }
 
 func (cr *reader) ReadAt(p []byte, off int64) (n int, err error) {
-	// todo implement me
+	if off < 0 {
+		err = ErrNegativeOffset
+		return
+	}
+	if off > int64(len(cr.buf)) {
+		err = io.EOF
+		return
+	}
+	n = cr.min(len(p), len(cr.buf)-int(off))
+	memcpy.Copy(p, cr.buf[off:])
+	if n < len(p) {
+		err = io.EOF
+	}
 	return
 }
 
@@ -64,3 +77,12 @@ func (cr *reader) UnreadRune() error {
 	// todo implement me
 	return nil
 }
+
+func (cr *reader) min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+var ErrNegativeOffset = errors.New("negative offset")
