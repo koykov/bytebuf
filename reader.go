@@ -11,7 +11,6 @@ import (
 type Reader interface {
 	io.Reader
 	io.ReaderAt
-	io.ReaderFrom
 	io.ByteReader
 	io.ByteScanner
 	io.RuneReader
@@ -22,6 +21,10 @@ type Reader interface {
 type reader struct {
 	buf []byte
 	off int64
+}
+
+func NewReader(p []byte) Reader {
+	return &reader{buf: p}
 }
 
 func (cr *reader) Read(p []byte) (n int, err error) {
