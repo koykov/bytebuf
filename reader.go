@@ -3,6 +3,7 @@ package bytebuf
 import (
 	"errors"
 	"io"
+	"unicode/utf8"
 
 	"github.com/koykov/simd/memcpy"
 )
@@ -77,12 +78,29 @@ func (cr *reader) UnreadByte() error {
 }
 
 func (cr *reader) ReadRune() (r rune, size int, err error) {
-	// todo implement me
+	if cr.off >= int64(len(cr.buf)) {
+		err = io.EOF
+		return
+	}
+	if b := cr.buf[cr.off]; b < utf8.RuneSelf {
+		r = rune(b)
+		size = 1
+		return
+	}
+	r, size = utf8.DecodeRune(cr.buf[cr.off:])
+	cr.off += int64(size)
 	return
 }
 
 func (cr *reader) UnreadRune() error {
-	// todo implement me
+	if cr.off <= 0 {
+		return ErrOutOfRange
+	}
+	r, size := utf8.DecodeLastRune(cr.buf[:cr.off])
+	if r == utf8.RuneError {
+		return ErrBadRune
+	}
+	cr.off -= int64(size)
 	return nil
 }
 
@@ -96,4 +114,5 @@ func (cr *reader) min(a, b int) int {
 var (
 	ErrNegativeOffset = errors.New("negative offset")
 	ErrOutOfRange     = errors.New("out of range")
+	ErrBadRune        = errors.New("bad rune")
 )
