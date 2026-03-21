@@ -58,13 +58,21 @@ func (cr *reader) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (cr *reader) ReadByte() (byte, error) {
-	// todo implement me
-	return 0, nil
+func (cr *reader) ReadByte() (b byte, err error) {
+	if cr.off >= int64(len(cr.buf)) {
+		err = io.EOF
+		return
+	}
+	b = cr.buf[cr.off]
+	cr.off++
+	return
 }
 
 func (cr *reader) UnreadByte() error {
-	// todo implement me
+	if cr.off <= 0 {
+		return ErrOutOfRange
+	}
+	cr.off--
 	return nil
 }
 
@@ -85,4 +93,7 @@ func (cr *reader) min(a, b int) int {
 	return b
 }
 
-var ErrNegativeOffset = errors.New("negative offset")
+var (
+	ErrNegativeOffset = errors.New("negative offset")
+	ErrOutOfRange     = errors.New("out of range")
+)
