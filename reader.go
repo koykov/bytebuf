@@ -16,6 +16,7 @@ type Reader interface {
 	io.ByteScanner
 	io.RuneReader
 	io.RuneScanner
+	io.Seeker
 }
 
 type reader struct {
@@ -104,6 +105,25 @@ func (cr *reader) UnreadRune() error {
 	return nil
 }
 
+func (cr *reader) Seek(off int64, whence int) (int64, error) {
+	var pos int64
+	switch whence {
+	case io.SeekStart:
+		pos = off
+	case io.SeekCurrent:
+		pos = cr.off + off
+	case io.SeekEnd:
+		pos = int64(len(cr.buf)) + off
+	default:
+		return 0, ErrUnknownWhence
+	}
+	if pos < 0 {
+		return 0, ErrNegativePosition
+	}
+	cr.off = pos
+	return 0, nil
+}
+
 func (cr *reader) min(a, b int) int {
 	if a < b {
 		return a
@@ -112,7 +132,9 @@ func (cr *reader) min(a, b int) int {
 }
 
 var (
-	ErrNegativeOffset = errors.New("negative offset")
-	ErrOutOfRange     = errors.New("out of range")
-	ErrBadRune        = errors.New("bad rune")
+	ErrNegativeOffset   = errors.New("negative offset")
+	ErrNegativePosition = errors.New("negative position")
+	ErrOutOfRange       = errors.New("out of range")
+	ErrBadRune          = errors.New("bad rune")
+	ErrUnknownWhence    = errors.New("unknown whence")
 )
