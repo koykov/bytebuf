@@ -315,6 +315,6 @@ func (b *Chain) ToWriter() *ChainWriter {
 	return &ChainWriter{buf: b}
 }
 
-func (b *Chain) ToReader() *ChainReader {
-	return &ChainReader{buf: b}
+func (b *Chain) ToReader() Reader {
+	return &reader{buf: *b}
 }
