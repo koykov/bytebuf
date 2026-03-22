@@ -84,6 +84,7 @@ func (cr *reader) ReadRune() (r rune, size int, err error) {
 	if b := cr.buf[cr.off]; b < utf8.RuneSelf {
 		r = rune(b)
 		size = 1
+		cr.off++
 		return
 	}
 	r, size = utf8.DecodeRune(cr.buf[cr.off:])
@@ -118,8 +119,11 @@ func (cr *reader) Seek(off int64, whence int) (int64, error) {
 	if pos < 0 {
 		return 0, ErrNegativePosition
 	}
+	if l := int64(len(cr.buf)); pos > l {
+		pos = l
+	}
 	cr.off = pos
-	return 0, nil
+	return cr.off, nil
 }
 
 func (cr *reader) min(a, b int) int {
