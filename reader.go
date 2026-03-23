@@ -51,7 +51,7 @@ func (cr *reader) ReadAt(p []byte, off int64) (n int, err error) {
 		return
 	}
 	n = cr.min(len(p), len(cr.buf)-int(off))
-	memcpy.Copy(p, cr.buf[off:])
+	memcpy.Copy(p, cr.buf[off:off+int64(n)])
 	if n < len(p) {
 		err = io.EOF
 	}
