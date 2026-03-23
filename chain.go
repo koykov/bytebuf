@@ -189,7 +189,7 @@ func (b *Chain) WriteULEB128(v uint64) *Chain {
 			c |= 0x80
 		}
 		b.WriteByte(c)
-		if v == 0 {
+		if c&0x80 == 0 {
 			break
 		}
 	}
@@ -313,4 +313,9 @@ func (b *Chain) Reduce(delta int) *Chain {
 // ToWriter wraps buffer with class implementing IO interfaces.
 func (b *Chain) ToWriter() *ChainWriter {
 	return &ChainWriter{buf: b}
+}
+
+// ToReader wraps buffer with class implementing IO interfaces.
+func (b *Chain) ToReader() Reader {
+	return &reader{buf: *b}
 }

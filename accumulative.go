@@ -131,3 +131,8 @@ func (b *Accumulative) Error() error {
 func (b *Accumulative) ToWriter() *AccumulativeWriter {
 	return &AccumulativeWriter{buf: b}
 }
+
+// ToReader wraps buffer with class implementing IO interfaces.
+func (b *Accumulative) ToReader() Reader {
+	return &reader{buf: b.buf}
+}
