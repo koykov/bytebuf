@@ -121,7 +121,7 @@ func (b *Chain) WriteFormat(format string, args ...any) *Chain {
 
 // WriteBinary writes binary representation of x with arbitrary type to the buffer in given byte order.
 func (b *Chain) WriteBinary(order binary.ByteOrder, x any) *Chain {
-	w := ChainWriter{buf: b}
+	w := writer{buf: b}
 	_ = binary.Write(&w, order, x)
 	return b
 }
@@ -311,8 +311,8 @@ func (b *Chain) Reduce(delta int) *Chain {
 }
 
 // ToWriter wraps buffer with class implementing IO interfaces.
-func (b *Chain) ToWriter() *ChainWriter {
-	return &ChainWriter{buf: b}
+func (b *Chain) ToWriter() Writer {
+	return writer{buf: b}
 }
 
 // ToReader wraps buffer with class implementing IO interfaces.
