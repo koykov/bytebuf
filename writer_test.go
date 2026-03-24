@@ -911,3 +911,69 @@ func TestWriter(t *testing.T) {
 		}
 	})
 }
+
+func BenchmarkWriter(b *testing.B) {
+	b.Run("write", func(b *testing.B) {
+		w := NewWriter(nil)
+		data := []byte("test data")
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.Write(data)
+		}
+	})
+
+	b.Run("big data", func(b *testing.B) {
+		w := NewWriter(nil)
+		size := 1024 * 1024
+		data := bytes.Repeat([]byte("x"), size)
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.Write(data)
+		}
+	})
+
+	b.Run("write int", func(b *testing.B) {
+		w := NewWriter(nil)
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteInt(123456789)
+		}
+	})
+
+	b.Run("write ULEB128", func(b *testing.B) {
+		w := NewWriter(nil)
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteULEB128(123456789)
+		}
+	})
+
+	b.Run("write SLEB128", func(b *testing.B) {
+		w := NewWriter(nil)
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteSLEB128(-123456789)
+		}
+	})
+
+	b.Run("write apply fn", func(b *testing.B) {
+		w := NewWriter(nil)
+		data := []byte("test data")
+		fn := func(dst, p []byte) []byte {
+			return append(dst, p...)
+		}
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteApplyFn(data, fn)
+		}
+	})
+}
