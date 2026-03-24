@@ -5,6 +5,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/koykov/simd/memcpy"
 	"github.com/koykov/x2bytes"
 )
 
@@ -15,6 +16,7 @@ type Writer interface {
 	io.WriterAt
 	Grow(newLen int)
 	GrowDelta(delta int)
+	WriteRune(r rune) (int, error)
 	WriteInt(i int64) (int, error)
 	WriteUint(u uint64) (int, error)
 	WriteFloat(f float64) (int, error)
@@ -39,6 +41,10 @@ type Writer interface {
 
 type writer struct {
 	buf *Chain
+}
+
+func NewWriter(p []byte) Writer {
+	return writer{buf: NewChain(p)}
 }
 
 func (w writer) Grow(newLen int) {
@@ -73,9 +79,20 @@ func (w writer) WriteString(s string) (int, error) {
 }
 
 func (w writer) WriteAt(p []byte, off int64) (int, error) {
-	w.buf.Grow(int(off))
-	w.buf.Write(p)
+	if off < 0 {
+		return 0, ErrNegativeOffset
+	}
+	if w.buf.Len() < int(off)+len(p) {
+		w.buf.Grow(int(off) + len(p))
+	}
+	memcpy.Copy((*w.buf)[off:], p)
 	return len(p), nil
+}
+
+func (w writer) WriteRune(r rune) (int, error) {
+	l := w.buf.Len()
+	w.buf.WriteRune(r)
+	return w.buf.Len() - l, nil
 }
 
 func (w writer) WriteInt(i int64) (int, error) {
@@ -112,7 +129,6 @@ func (w writer) WriteX(x any) (int, error) {
 	off := w.buf.Len()
 	var err error
 	*w.buf, err = x2bytes.ToBytes(*w.buf, x)
-	w.buf.WriteX(x)
 	return w.buf.Len() - off, err
 }
 
