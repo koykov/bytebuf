@@ -31,3 +31,7 @@ func (b *Accumulative) ReplaceStr(old, new string, n int) *Accumulative {
 func (b *Accumulative) ReplaceStrAll(old, new string) *Accumulative {
 	return b.ReplaceStringAll(old, new)
 }
+
+// AccumulativeWriter is a wrapper around Accumulative that implements IO writers interfaces.
+// Deprecated: use Writer interface instead.
+type AccumulativeWriter writer

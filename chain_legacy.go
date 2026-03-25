@@ -31,3 +31,7 @@ func (b *Chain) ReplaceStr(old, new string, n int) *Chain {
 func (b *Chain) ReplaceStrAll(old, new string) *Chain {
 	return b.ReplaceStringAll(old, new)
 }
+
+// ChainWriter is a wrapper around Chain that implements IO writers interfaces.
+// Deprecated: use Writer interface instead.
+type ChainWriter writer
