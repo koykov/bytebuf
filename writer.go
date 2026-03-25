@@ -1,6 +1,7 @@
 package bytebuf
 
 import (
+	"bytes"
 	"encoding/binary"
 	"io"
 	"time"
@@ -14,6 +15,7 @@ type Writer interface {
 	io.StringWriter
 	io.ByteWriter
 	io.WriterAt
+	io.ReaderFrom
 	Grow(newLen int)
 	GrowDelta(delta int)
 	WriteRune(r rune) (int, error)
@@ -178,6 +180,24 @@ func (w writer) WriteSLEB128(v int64) (int, error) {
 	off := w.buf.Len()
 	w.buf.WriteSLEB128(v)
 	return w.buf.Len() - off, nil
+}
+
+func (w writer) ReadFrom(r io.Reader) (n int64, err error) {
+	for {
+		off := w.Len()
+		w.GrowDelta(bytes.MinRead)
+		buf := (*w.buf)[off : off+bytes.MinRead]
+		var m int
+		m, err = r.Read(buf)
+		n += int64(m)
+		if err == io.EOF {
+			err = nil
+			return
+		}
+		if err != nil {
+			return
+		}
+	}
 }
 
 func (w writer) Len() int {
