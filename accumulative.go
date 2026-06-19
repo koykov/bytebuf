@@ -73,7 +73,7 @@ func (b *Accumulative) StakedStringCopy() string {
 }
 
 // StackedByteptr returns byteptr wrapper for stacked bytes.
-func (b *Accumulative) StackedByteptr() (p byteptr.Byteptr) {
+func (b *Accumulative) StackedByteptr() (p byteptr.Pointer) {
 	p.Init(b.buf, b.off, b.Len()-b.off)
 	return
 }
