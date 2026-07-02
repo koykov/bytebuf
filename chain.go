@@ -13,6 +13,7 @@ import (
 	"github.com/koykov/clock"
 	"github.com/koykov/simd/memclr"
 	"github.com/koykov/x2bytes"
+	"golang.org/x/text/unicode/norm"
 )
 
 // Chain is a primitive byte buffer with chain call support.
@@ -211,6 +212,21 @@ func (b *Chain) WriteSLEB128(v int64) *Chain {
 		}
 	}
 	return b
+}
+
+// WriteNormalize writes p in given Unicode Normalization Form.
+func (b *Chain) WriteNormalize(p []byte, form norm.Form) *Chain {
+	off := b.Len()
+	b.GrowDelta(len(p) + 1)
+	buf := (*b)[off:]
+	buf = form.Append(buf[:0], p...)
+	*b = append((*b)[:off], buf...)
+	return b
+}
+
+// WriteNormalizeString writes s in given Unicode Normalization Form.
+func (b *Chain) WriteNormalizeString(s string, form norm.Form) *Chain {
+	return b.WriteNormalize(byteconv.S2B(s), form)
 }
 
 // Replace replaces old bytes to new in buffer.

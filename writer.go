@@ -8,6 +8,7 @@ import (
 
 	"github.com/koykov/simd/memcpy"
 	"github.com/koykov/x2bytes"
+	"golang.org/x/text/unicode/norm"
 )
 
 type Writer interface {
@@ -33,6 +34,8 @@ type Writer interface {
 	WriteTime(format string, t time.Time) (int, error)
 	WriteULEB128(v uint64) (int, error)
 	WriteSLEB128(v int64) (int, error)
+	WriteNormalize(p []byte, form norm.Form) (int, error)
+	WriteNormalizeString(s string, form norm.Form) (int, error)
 	Len() int
 	Cap() int
 	Bytes() []byte
@@ -179,6 +182,18 @@ func (w writer) WriteULEB128(v uint64) (int, error) {
 func (w writer) WriteSLEB128(v int64) (int, error) {
 	off := w.buf.Len()
 	w.buf.WriteSLEB128(v)
+	return w.buf.Len() - off, nil
+}
+
+func (w writer) WriteNormalize(p []byte, form norm.Form) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteNormalize(p, form)
+	return w.buf.Len() - off, nil
+}
+
+func (w writer) WriteNormalizeString(s string, form norm.Form) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteNormalizeString(s, form)
 	return w.buf.Len() - off, nil
 }
 

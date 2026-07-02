@@ -7,6 +7,7 @@ import (
 
 	"github.com/koykov/clock"
 	"github.com/koykov/x2bytes"
+	"golang.org/x/text/unicode/norm"
 )
 
 // Contains wrapper methods over inner Chain.
@@ -160,6 +161,18 @@ func (b *Accumulative) WriteULEB128(v uint64) *Accumulative {
 // WriteSLEB128 writes signed LEB128 representation of int64 value to the buffer.
 func (b *Accumulative) WriteSLEB128(v int64) *Accumulative {
 	b.buf.WriteSLEB128(v)
+	return b
+}
+
+// WriteNormalize writes p in given Unicode Normalization Form.
+func (b *Accumulative) WriteNormalize(p []byte, form norm.Form) *Accumulative {
+	b.buf.WriteNormalize(p, form)
+	return b
+}
+
+// WriteNormalizeString writes s in given Unicode Normalization Form.
+func (b *Accumulative) WriteNormalizeString(s string, form norm.Form) *Accumulative {
+	b.buf.WriteNormalizeString(s, form)
 	return b
 }
 
