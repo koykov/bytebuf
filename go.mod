@@ -10,6 +10,7 @@ require (
 	github.com/koykov/entry v1.0.2
 	github.com/koykov/simd v0.0.14
 	github.com/koykov/x2bytes v1.0.4
+	golang.org/x/text v0.22.0
 )
 
 require (
