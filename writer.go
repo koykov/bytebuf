@@ -207,6 +207,9 @@ func (w writer) ReadFrom(r io.Reader) (n int64, err error) {
 		n += int64(m)
 		if err == io.EOF {
 			err = nil
+			if m < bytes.MinRead {
+				*w.buf = (*w.buf)[:len(*w.buf)-(bytes.MinRead-m)]
+			}
 			return
 		}
 		if err != nil {
