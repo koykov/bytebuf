@@ -104,6 +104,18 @@ func (b *Accumulative) WriteBinary(order binary.ByteOrder, x any) *Accumulative 
 	return b
 }
 
+// WriteHex writes hex representation of p.
+func (b *Accumulative) WriteHex(p []byte) *Accumulative {
+	b.buf.WriteHex(p)
+	return b
+}
+
+// WriteHexString writes hex representation of s.
+func (b *Accumulative) WriteHexString(s string) *Accumulative {
+	b.buf.WriteHexString(s)
+	return b
+}
+
 // WriteX write v with arbitrary type to the buffer.
 func (b *Accumulative) WriteX(x any) *Accumulative {
 	b.buf, b.err = x2bytes.ToBytes(b.buf, x)
