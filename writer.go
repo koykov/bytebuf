@@ -25,6 +25,8 @@ type Writer interface {
 	WriteFloat(f float64) (int, error)
 	WriteBool(b bool) (int, error)
 	WriteBinary(order binary.ByteOrder, x any) (int, error)
+	WriteHex(p []byte) (int, error)
+	WriteHexString(s string) (int, error)
 	WriteX(x any) (int, error)
 	WriteMarshallerTo(m MarshallerTo) (int, error)
 	WriteApplyFn(p []byte, fn func(dst, p []byte) []byte) (int, error)
@@ -128,6 +130,18 @@ func (w writer) WriteBinary(order binary.ByteOrder, x any) (int, error) {
 	off := w.buf.Len()
 	err := binary.Write(w, order, x)
 	return w.buf.Len() - off, err
+}
+
+func (w writer) WriteHex(p []byte) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteHex(p)
+	return w.buf.Len() - off, nil
+}
+
+func (w writer) WriteHexString(s string) (int, error) {
+	off := w.buf.Len()
+	w.buf.WriteHexString(s)
+	return w.buf.Len() - off, nil
 }
 
 func (w writer) WriteX(x any) (int, error) {

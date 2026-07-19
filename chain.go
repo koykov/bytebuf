@@ -2,6 +2,7 @@ package bytebuf
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"time"
@@ -124,6 +125,18 @@ func (b *Chain) WriteFormat(format string, args ...any) *Chain {
 func (b *Chain) WriteBinary(order binary.ByteOrder, x any) *Chain {
 	w := writer{buf: b}
 	_ = binary.Write(&w, order, x)
+	return b
+}
+
+// WriteHex writes hex representation of p.
+func (b *Chain) WriteHex(p []byte) *Chain {
+	*b = hex.AppendEncode(*b, p)
+	return b
+}
+
+// WriteHexString writes hex representation of s.
+func (b *Chain) WriteHexString(s string) *Chain {
+	*b = hex.AppendEncode(*b, byteconv.S2B(s))
 	return b
 }
 
