@@ -53,7 +53,7 @@ func (b *Chain) WriteUintIf(cond bool, u uint64) *Chain {
 
 func (b *Chain) WriteUintBaseIf(cond bool, u uint64, base int) *Chain {
 	if cond {
-		b.WriteUint(u)
+		b.WriteUintBase(u, base)
 	}
 	return b
 }
