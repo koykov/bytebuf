@@ -3,6 +3,8 @@ package bytebuf
 import (
 	"encoding/binary"
 	"time"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 // WriteN writes p to buffer N times.
@@ -127,6 +129,40 @@ func (b *Chain) WriteULEB128N(v uint64, n int) *Chain {
 func (b *Chain) WriteSLEB128N(v int64, n int) *Chain {
 	for i := 0; i < n; i++ {
 		b.WriteSLEB128(v)
+	}
+	return b
+}
+
+// WriteNormalizeN writes p N times in given Unicode Normalization Form.
+// See WriteNormalize.
+func (b *Chain) WriteNormalizeN(p []byte, form norm.Form, n int) *Chain {
+	for i := 0; i < n; i++ {
+		b.WriteNormalize(p, form)
+	}
+	return b
+}
+
+// WriteNormalizeStringN writes s N times in given Unicode Normalization Form.
+// See WriteNormalizeString.
+func (b *Chain) WriteNormalizeStringN(s string, form norm.Form, n int) *Chain {
+	for i := 0; i < n; i++ {
+		b.WriteNormalizeString(s, form)
+	}
+	return b
+}
+
+// WriteHexN writes hex representation of p N times.
+func (b *Chain) WriteHexN(p []byte, n int) *Chain {
+	for i := 0; i < n; i++ {
+		b.WriteHex(p)
+	}
+	return b
+}
+
+// WriteHexStringN writes hex representation of s N times.
+func (b *Chain) WriteHexStringN(s string, n int) *Chain {
+	for i := 0; i < n; i++ {
+		b.WriteHexString(s)
 	}
 	return b
 }

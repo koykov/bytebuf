@@ -3,6 +3,8 @@ package bytebuf
 import (
 	"encoding/binary"
 	"time"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 // Contains conditional write methods.
@@ -89,5 +91,25 @@ func (b *Accumulative) WriteULEB128If(cond bool, v uint64) *Accumulative {
 
 func (b *Accumulative) WriteSLEB128If(cond bool, v int64) *Accumulative {
 	b.buf.WriteSLEB128If(cond, v)
+	return b
+}
+
+func (b *Accumulative) WriteNormalizeIf(cond bool, p []byte, form norm.Form) *Accumulative {
+	b.buf.WriteNormalizeIf(cond, p, form)
+	return b
+}
+
+func (b *Accumulative) WriteNormalizeStringIf(cond bool, s string, form norm.Form) *Accumulative {
+	b.buf.WriteNormalizeStringIf(cond, s, form)
+	return b
+}
+
+func (b *Accumulative) WriteHexIf(cond bool, p []byte) *Accumulative {
+	b.buf.WriteHexIf(cond, p)
+	return b
+}
+
+func (b *Accumulative) WriteHexStringIf(cond bool, s string) *Accumulative {
+	b.buf.WriteHexStringIf(cond, s)
 	return b
 }

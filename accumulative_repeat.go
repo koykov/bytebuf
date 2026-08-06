@@ -3,6 +3,8 @@ package bytebuf
 import (
 	"encoding/binary"
 	"time"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 // WriteN writes p to buffer N times.
@@ -85,26 +87,46 @@ func (b *Accumulative) WriteXN(x any, n int) *Accumulative {
 // WriteTimeN writes time in given format to buffer N times.
 // See WriteTime.
 func (b *Accumulative) WriteTimeN(format string, t time.Time, n int) *Accumulative {
-	for i := 0; i < n; i++ {
-		b.WriteTime(format, t)
-	}
+	b.buf.WriteTimeN(format, t, n)
 	return b
 }
 
 // WriteULEB128N writes unsigned LEB128 representation of uint64 value to buffer N times.
 // See WriteULEB128.
 func (b *Accumulative) WriteULEB128N(v uint64, n int) *Accumulative {
-	for i := 0; i < n; i++ {
-		b.WriteULEB128(v)
-	}
+	b.buf.WriteULEB128N(v, n)
 	return b
 }
 
 // WriteSLEB128N writes signed LEB128 representation of uint64 value to buffer N times.
 // See WriteSLEB128.
 func (b *Accumulative) WriteSLEB128N(v int64, n int) *Accumulative {
-	for i := 0; i < n; i++ {
-		b.WriteSLEB128(v)
-	}
+	b.buf.WriteSLEB128N(v, n)
+	return b
+}
+
+// WriteNormalizeN writes p N times in given Unicode Normalization Form.
+// See WriteNormalize.
+func (b *Accumulative) WriteNormalizeN(p []byte, form norm.Form, n int) *Accumulative {
+	b.buf.WriteNormalizeN(p, form, n)
+	return b
+}
+
+// WriteNormalizeStringN writes s N times in given Unicode Normalization Form.
+// See WriteNormalizeString.
+func (b *Accumulative) WriteNormalizeStringN(s string, form norm.Form, n int) *Accumulative {
+	b.buf.WriteNormalizeStringN(s, form, n)
+	return b
+}
+
+// WriteHexN writes hex representation of p N times.
+func (b *Accumulative) WriteHexN(p []byte, n int) *Accumulative {
+	b.buf.WriteHexN(p, n)
+	return b
+}
+
+// WriteHexStringN writes hex representation of s N times.
+func (b *Accumulative) WriteHexStringN(s string, n int) *Accumulative {
+	b.buf.WriteHexStringN(s, n)
 	return b
 }
