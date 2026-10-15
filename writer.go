@@ -219,11 +219,10 @@ func (w writer) ReadFrom(r io.Reader) (n int64, err error) {
 		var m int
 		m, err = r.Read(buf)
 		n += int64(m)
+		// Cut the unused tail of the chunk.
+		*w.buf = (*w.buf)[:off+m]
 		if err == io.EOF {
 			err = nil
-			if m < bytes.MinRead {
-				*w.buf = (*w.buf)[:len(*w.buf)-(bytes.MinRead-m)]
-			}
 			return
 		}
 		if err != nil {
