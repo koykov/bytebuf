@@ -236,11 +236,15 @@ func (b *Accumulative) GrowDelta(delta int) *Accumulative {
 
 func (b *Accumulative) Reset() *Accumulative {
 	b.buf.Reset()
+	b.off = 0
+	b.err = nil
 	return b
 }
 
 func (b *Accumulative) ResetSafe() *Accumulative {
 	b.buf.ResetSafe()
+	b.off = 0
+	b.err = nil
 	return b
 }
 
