@@ -10,6 +10,8 @@ import (
 
 	"github.com/koykov/byteconv"
 	"github.com/koykov/x2bytes"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestChain(t *testing.T) {
@@ -21,9 +23,7 @@ func TestChain(t *testing.T) {
 			WriteUint(stage.u).WriteByte('-').
 			WriteFloat(stage.f)
 
-		if !bytes.Equal(cb.Bytes(), expectWS) {
-			t.Error("Chain.Write*: mismatch result and expectation")
-		}
+		assert.True(t, bytes.Equal(expectWS, cb.Bytes()), "want %q, got %q", expectWS, cb.Bytes())
 	})
 	t.Run("apply fn", func(t *testing.T) {
 		cb := NewChainSize(128)
@@ -34,9 +34,7 @@ func TestChain(t *testing.T) {
 				return dst
 			}).
 			WriteString("bar")
-		if cb.String() != "foo%3Fq%3Dfront%26p%3D1bar" {
-			t.Error("Chain.WriteApplyFn*: mismatch result and expectation")
-		}
+		assert.Equal(t, "foo%3Fq%3Dfront%26p%3D1bar", cb.String())
 	})
 	t.Run("apply fn N", func(t *testing.T) {
 		cb := NewChainSize(128)
@@ -47,9 +45,7 @@ func TestChain(t *testing.T) {
 				return dst
 			}, 3).
 			WriteString("bar")
-		if cb.String() != "foo%25253Fq%25253Dfront%252526p%25253D1bar" {
-			t.Error("Chain.WriteApplyFn*: mismatch result and expectation")
-		}
+		assert.Equal(t, "foo%25253Fq%25253Dfront%252526p%25253D1bar", cb.String())
 	})
 	t.Run("reduce", func(t *testing.T) {
 		cb := Chain{}
@@ -57,51 +53,40 @@ func TestChain(t *testing.T) {
 			WriteIntBase(100, 16)
 		hex := cb.Bytes()[cb.Len()-2:]
 		cb.Reduce(4).Write(hex)
-		if cb.String() != "0x0064" {
-			t.FailNow()
-		}
+		require.Equal(t, "0x0064", cb.String())
 	})
 	t.Run("format", func(t *testing.T) {
 		cb := Chain{}
 		cb.WriteFormat("int %d; float %f; string %s", 513, 3.1415, "foobar")
-		if cb.String() != "int 513; float 3.141500; string foobar" {
-			t.FailNow()
-		}
+		require.Equal(t, "int 513; float 3.141500; string foobar", cb.String())
 	})
 	t.Run("bytes copy", func(t *testing.T) {
 		t.Run("empty buffer", func(t *testing.T) {
 			cb := NewChainSize(128)
-			if cp := cb.BytesCopy(); len(cp) != 0 {
-				t.Errorf("BytesCopy() = %v, want empty", cp)
-			}
+			cp := cb.BytesCopy()
+			assert.Equal(t, 0, len(cp))
 		})
 		t.Run("copy is independent of original", func(t *testing.T) {
 			cb := NewChainSize(128)
 			cb.WriteString("original")
 			cp := cb.BytesCopy()
-			if !bytes.Equal(cp, []byte("original")) {
-				t.Fatalf("BytesCopy() = %q, want %q", cp, "original")
-			}
+			require.True(t, bytes.Equal([]byte("original"), cp), "want %q, got %q", []byte("original"), cp)
 			// Mutating the copy must not leak into the original buffer.
 			cp[0] = 'X'
-			if !bytes.Equal(cb.Bytes(), []byte("original")) {
-				t.Errorf("mutating copy changed original: got %q, want %q", cb.Bytes(), "original")
-			}
+			assert.True(t, bytes.Equal([]byte("original"), cb.Bytes()), "want %q, got %q", []byte("original"), cb.Bytes())
 		})
 	})
 	t.Run("string copy", func(t *testing.T) {
 		t.Run("empty buffer", func(t *testing.T) {
 			cb := NewChainSize(128)
-			if s := cb.StringCopy(); s != "" {
-				t.Errorf("StringCopy() = %q, want empty", s)
-			}
+			s := cb.StringCopy()
+			assert.Equal(t, "", s)
 		})
 		t.Run("returns equal string", func(t *testing.T) {
 			cb := NewChainSize(128)
 			cb.WriteString("hello copy")
-			if s := cb.StringCopy(); s != "hello copy" {
-				t.Errorf("StringCopy() = %q, want %q", s, "hello copy")
-			}
+			s := cb.StringCopy()
+			assert.Equal(t, "hello copy", s)
 		})
 	})
 	t.Run("write uint in base", func(t *testing.T) {
@@ -122,9 +107,7 @@ func TestChain(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				cb := NewChainSize(128)
 				cb.WriteUintBase(tt.value, tt.base)
-				if cb.String() != tt.expected {
-					t.Errorf("WriteUintBase(%d, %d) = %q, want %q", tt.value, tt.base, cb.String(), tt.expected)
-				}
+				assert.Equal(t, tt.expected, cb.String())
 			})
 		}
 	})
@@ -154,9 +137,7 @@ func TestChain(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				cb := NewChainSize(128)
 				cb.WriteBinary(tt.order, &binStruct{A: 0x12345678, B: 0xABCD, C: 0xFF})
-				if !bytes.Equal(cb.Bytes(), tt.expected) {
-					t.Errorf("WriteBinary() = %v, want %v", cb.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, cb.Bytes()), "want %q, got %q", tt.expected, cb.Bytes())
 			})
 		}
 	})
@@ -186,9 +167,7 @@ func TestChain(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				cb := NewChainSize(128)
 				cb.WriteX(tt.value)
-				if cb.String() != tt.expected {
-					t.Errorf("WriteX(%v) = %q, want %q", tt.value, cb.String(), tt.expected)
-				}
+				assert.Equal(t, tt.expected, cb.String())
 			})
 		}
 	})
@@ -196,12 +175,9 @@ func TestChain(t *testing.T) {
 		cb := NewChainSize(128)
 		cb.WriteString("foo")
 		w := cb.ToWriter()
-		if _, err := w.WriteString("bar"); err != nil {
-			t.Fatalf("Writer.WriteString() error = %v", err)
-		}
-		if cb.String() != "foobar" {
-			t.Errorf("Chain after Writer.WriteString() = %q, want %q", cb.String(), "foobar")
-		}
+		_, err := w.WriteString("bar")
+		require.NoError(t, err)
+		assert.Equal(t, "foobar", cb.String())
 	})
 	t.Run("to reader", func(t *testing.T) {
 		cb := NewChainSize(128)
@@ -209,15 +185,9 @@ func TestChain(t *testing.T) {
 		r := cb.ToReader()
 		buf := make([]byte, 5)
 		n, err := r.Read(buf)
-		if err != nil {
-			t.Fatalf("Reader.Read() error = %v", err)
-		}
-		if n != len(buf) {
-			t.Fatalf("Reader.Read() read %d bytes, want %d", n, len(buf))
-		}
-		if !bytes.Equal(buf, []byte("hello")) {
-			t.Errorf("Reader.Read() = %q, want %q", buf, "hello")
-		}
+		require.NoError(t, err)
+		require.Equal(t, len(buf), n)
+		assert.True(t, bytes.Equal([]byte("hello"), buf), "want %q, got %q", []byte("hello"), buf)
 	})
 }
 

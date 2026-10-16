@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"io"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestReader(t *testing.T) {
@@ -58,18 +61,14 @@ func TestReader(t *testing.T) {
 				buf := make([]byte, tt.readSize)
 				n, err := r.Read(buf)
 
-				if (err != nil) != tt.wantErr {
-					t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
-					return
+				if tt.wantErr {
+					require.Error(t, err)
+				} else {
+					require.NoError(t, err)
 				}
 
-				if n != len(tt.want) {
-					t.Errorf("Read() read %d bytes, want %d", n, len(tt.want))
-				}
-
-				if !bytes.Equal(buf[:n], tt.want) {
-					t.Errorf("Read() got %v, want %v", buf[:n], tt.want)
-				}
+				assert.Equal(t, len(tt.want), n)
+				assert.True(t, bytes.Equal(tt.want, buf[:n]), "want %q, got %q", tt.want, buf[:n])
 			})
 		}
 	})
@@ -134,17 +133,11 @@ func TestReader(t *testing.T) {
 				buf := make([]byte, tt.size)
 				n, err := r.ReadAt(buf, tt.offset)
 
-				if err != tt.wantErr {
-					t.Errorf("ReadAt() error = %v, wantErr %v", err, tt.wantErr)
-				}
-
-				if n != len(tt.want) {
-					t.Errorf("ReadAt() read %d bytes, want %d", n, len(tt.want))
-				}
-
-				if !bytes.Equal(buf[:n], tt.want) {
-					t.Errorf("ReadAt() got %v, want %v", buf[:n], tt.want)
-				}
+				assert.Equal(t, tt.wantErr, err)
+				assert.Equal(t, len(tt.want), n)
+				// bytes.Equal treats nil and empty slices as equal, matching
+				// the original assertion (assert.Equal does not).
+				assert.True(t, bytes.Equal(tt.want, buf[:n]), "ReadAt() got %v, want %v", buf[:n], tt.want)
 			})
 		}
 	})
@@ -155,18 +148,12 @@ func TestReader(t *testing.T) {
 
 		for i, expected := range data {
 			b, err := r.ReadByte()
-			if err != nil {
-				t.Errorf("ReadByte() at index %d error = %v", i, err)
-			}
-			if b != expected {
-				t.Errorf("ReadByte() at index %d got %c, want %c", i, b, expected)
-			}
+			assert.NoError(t, err, "ReadByte() at index %d", i)
+			assert.Equal(t, expected, b, "ReadByte() at index %d", i)
 		}
 
 		_, err := r.ReadByte()
-		if err != io.EOF {
-			t.Errorf("ReadByte() after EOF error = %v, want io.EOF", err)
-		}
+		assert.Equal(t, io.EOF, err)
 	})
 
 	t.Run("unread byte", func(t *testing.T) {
@@ -210,9 +197,7 @@ func TestReader(t *testing.T) {
 
 				for i := 0; i < tt.readCount; i++ {
 					_, err := r.ReadByte()
-					if err != nil {
-						t.Fatalf("Failed to read: %v", err)
-					}
+					require.NoError(t, err, "Failed to read")
 				}
 
 				var err error
@@ -220,16 +205,16 @@ func TestReader(t *testing.T) {
 					err = r.UnreadByte()
 				}
 
-				if (err != nil) != tt.wantErr {
-					t.Errorf("UnreadByte() error = %v, wantErr %v", err, tt.wantErr)
+				if tt.wantErr {
+					assert.Error(t, err)
+				} else {
+					assert.NoError(t, err)
 				}
 
 				if !tt.wantErr {
 					buf := make([]byte, len(tt.wantAfter))
 					n, _ := r.Read(buf)
-					if !bytes.Equal(buf[:n], tt.wantAfter) {
-						t.Errorf("After unread got %v, want %v", buf[:n], tt.wantAfter)
-					}
+					assert.True(t, bytes.Equal(tt.wantAfter, buf[:n]), "want %q, got %q", tt.wantAfter, buf[:n])
 				}
 			})
 		}
@@ -268,21 +253,13 @@ func TestReader(t *testing.T) {
 
 				for i, expectedRune := range tt.expected {
 					ch, size, err := r.ReadRune()
-					if err != nil {
-						t.Errorf("ReadRune() at index %d error = %v", i, err)
-					}
-					if ch != expectedRune {
-						t.Errorf("ReadRune() got %c, want %c", ch, expectedRune)
-					}
-					if size != tt.expectedSizes[i] {
-						t.Errorf("ReadRune() size = %d, want %d", size, tt.expectedSizes[i])
-					}
+					assert.NoError(t, err, "ReadRune() at index %d", i)
+					assert.Equal(t, expectedRune, ch)
+					assert.Equal(t, tt.expectedSizes[i], size)
 				}
 
 				_, _, err := r.ReadRune()
-				if err != io.EOF {
-					t.Errorf("ReadRune() after EOF error = %v, want io.EOF", err)
-				}
+				assert.Equal(t, io.EOF, err)
 			})
 		}
 	})
@@ -292,25 +269,17 @@ func TestReader(t *testing.T) {
 		r := NewReader([]byte(data))
 
 		first, _, _ := r.ReadRune()
-		if first != 'H' {
-			t.Errorf("First rune = %c, want H", first)
-		}
+		assert.Equal(t, 'H', first)
 
 		err := r.UnreadRune()
-		if err != nil {
-			t.Errorf("UnreadRune() error = %v", err)
-		}
+		assert.NoError(t, err)
 
 		again, _, _ := r.ReadRune()
-		if again != 'H' {
-			t.Errorf("After unread got %c, want H", again)
-		}
+		assert.Equal(t, 'H', again)
 
 		_ = r.UnreadRune()
 		err = r.UnreadRune()
-		if err == nil {
-			t.Error("Second UnreadRune() should fail")
-		}
+		assert.Error(t, err, "Second UnreadRune() should fail")
 	})
 
 	t.Run("seek", func(t *testing.T) {
@@ -386,21 +355,20 @@ func TestReader(t *testing.T) {
 				}
 
 				pos, err := r.Seek(tt.offset, tt.whence)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("Seek() error = %v, wantErr %v", err, tt.wantErr)
-					return
+				if tt.wantErr {
+					require.Error(t, err)
+				} else {
+					require.NoError(t, err)
 				}
 
-				if !tt.wantErr && pos != tt.wantPos {
-					t.Errorf("Seek() position = %d, want %d", pos, tt.wantPos)
+				if !tt.wantErr {
+					assert.Equal(t, tt.wantPos, pos)
 				}
 
 				if tt.readWant != nil {
 					buf := make([]byte, len(tt.readWant))
 					n, _ := r.Read(buf)
-					if !bytes.Equal(buf[:n], tt.readWant) {
-						t.Errorf("After seek read = %v, want %v", buf[:n], tt.readWant)
-					}
+					assert.True(t, bytes.Equal(tt.readWant, buf[:n]), "want %q, got %q", tt.readWant, buf[:n])
 				}
 			})
 		}
@@ -412,45 +380,32 @@ func TestReader(t *testing.T) {
 
 		buf := make([]byte, 7)
 		n, _ := r.Read(buf)
-		if string(buf[:n]) != "Hello, " {
-			t.Errorf("Read() got %s, want 'Hello, '", buf[:n])
-		}
+		assert.Equal(t, "Hello, ", string(buf[:n]))
 
 		ch, size, _ := r.ReadRune()
-		if ch != '世' || size != 3 {
-			t.Errorf("ReadRune() got %c (size %d), want 世 (size 3)", ch, size)
-		}
+		assert.Equal(t, '世', ch)
+		assert.Equal(t, 3, size)
 
 		err := r.UnreadRune()
-		if err != nil {
-			t.Errorf("UnreadRune() error = %v", err)
-		}
+		assert.NoError(t, err)
 
 		ch, size, _ = r.ReadRune()
-		if ch != '世' || size != 3 {
-			t.Errorf("After unread got %c (size %d), want 世 (size 3)", ch, size)
-		}
+		assert.Equal(t, '世', ch)
+		assert.Equal(t, 3, size)
 
 		ch, size, _ = r.ReadRune()
-		if ch != '界' || size != 3 {
-			t.Errorf("ReadRune() got %c (size %d), want 界 (size 3)", ch, size)
-		}
+		assert.Equal(t, '界', ch)
+		assert.Equal(t, 3, size)
 
 		pos, _ := r.Seek(0, io.SeekStart)
-		if pos != 0 {
-			t.Errorf("Seek to start got %d", pos)
-		}
+		assert.Equal(t, int64(0), pos)
 
 		buf2 := make([]byte, 7)
 		n, _ = r.ReadAt(buf2, 0)
-		if string(buf2[:n]) != "Hello, " {
-			t.Errorf("ReadAt() got %s, want 'Hello, '", buf2[:n])
-		}
+		assert.Equal(t, "Hello, ", string(buf2[:n]))
 
 		currentPos, _ := r.Seek(0, io.SeekCurrent)
-		if currentPos != 0 {
-			t.Errorf("After ReadAt position = %d, want 0", currentPos)
-		}
+		assert.Equal(t, int64(0), currentPos)
 	})
 
 	t.Run("big data", func(t *testing.T) {
@@ -473,18 +428,16 @@ func TestReader(t *testing.T) {
 			buf := make([]byte, readSize)
 			n, err := r.Read(buf)
 
-			if err != nil && offset+readSize < size {
-				t.Errorf("Read() at offset %d error = %v", offset, err)
+			if offset+readSize < size {
+				assert.NoError(t, err, "Read() at offset %d", offset)
 			}
 
-			if n != readSize {
-				t.Errorf("Read() at offset %d read %d bytes, want %d", offset, n, readSize)
-			}
+			assert.Equal(t, readSize, n, "Read() at offset %d", offset)
 
 			for i := 0; i < n; i++ {
 				if buf[i] != largeData[offset+i] {
-					t.Errorf("Data mismatch at offset %d/%d: got %d, want %d",
-						i, offset+i, buf[i], largeData[offset+i])
+					assert.Equal(t, largeData[offset+i], buf[i],
+						"Data mismatch at offset %d/%d", i, offset+i)
 					break
 				}
 			}
@@ -492,9 +445,7 @@ func TestReader(t *testing.T) {
 
 		buf := make([]byte, 1)
 		_, err := r.Read(buf)
-		if err != io.EOF {
-			t.Errorf("After reading all data, Read() error = %v, want io.EOF", err)
-		}
+		assert.Equal(t, io.EOF, err, "after reading all data")
 
 		t.Run("random access", func(t *testing.T) {
 			size := 50 * 1024 * 1024 // 50 MB
@@ -521,8 +472,8 @@ func TestReader(t *testing.T) {
 					buf := make([]byte, 100)
 					n, err := r.ReadAt(buf, pos)
 
-					if err != nil && pos+100 < int64(size) {
-						t.Errorf("ReadAt(%d) error = %v", pos, err)
+					if pos+100 < int64(size) {
+						assert.NoError(t, err, "ReadAt(%d)", pos)
 					}
 
 					expectedSize := 100
@@ -530,13 +481,12 @@ func TestReader(t *testing.T) {
 						expectedSize = size - int(pos)
 					}
 
-					if n != expectedSize {
-						t.Errorf("ReadAt(%d) read %d bytes, want %d", pos, n, expectedSize)
-					}
+					assert.Equal(t, expectedSize, n, "ReadAt(%d)", pos)
 
 					for i := 0; i < n; i++ {
 						if buf[i] != largeData[pos+int64(i)] {
-							t.Errorf("ReadAt(%d) data mismatch at offset %d", pos, pos+int64(i))
+							assert.Equal(t, largeData[pos+int64(i)], buf[i],
+								"ReadAt(%d) data mismatch at offset %d", pos, pos+int64(i))
 							break
 						}
 					}

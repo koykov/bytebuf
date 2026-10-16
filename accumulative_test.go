@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/koykov/x2bytes"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccumulative(t *testing.T) {
@@ -21,45 +23,36 @@ func TestAccumulative(t *testing.T) {
 			WriteUint(stage.u).WriteByte('-').
 			WriteFloat(stage.f)
 
-		if !bytes.Equal(ab.StakedBytes(), expectWS) {
-			t.Error("Accumulative.Write*: mismatch result and expectation")
-		}
+		assert.True(t, bytes.Equal(expectWS, ab.StakedBytes()), "want %q, got %q", expectWS, ab.StakedBytes())
 	})
 
 	t.Run("bytes copy", func(t *testing.T) {
 		t.Run("empty buffer", func(t *testing.T) {
 			ab := NewAccumulativeSize(128)
-			if cp := ab.BytesCopy(); len(cp) != 0 {
-				t.Errorf("BytesCopy() = %v, want empty", cp)
-			}
+			cp := ab.BytesCopy()
+			assert.Equal(t, 0, len(cp))
 		})
 		t.Run("copy is independent of original", func(t *testing.T) {
 			ab := NewAccumulativeSize(128)
 			ab.WriteString("original")
 			cp := ab.BytesCopy()
-			if !bytes.Equal(cp, []byte("original")) {
-				t.Fatalf("BytesCopy() = %q, want %q", cp, "original")
-			}
+			require.True(t, bytes.Equal([]byte("original"), cp), "want %q, got %q", []byte("original"), cp)
 			cp[0] = 'X'
-			if !bytes.Equal(ab.Bytes(), []byte("original")) {
-				t.Errorf("mutating copy changed original: got %q, want %q", ab.Bytes(), "original")
-			}
+			assert.True(t, bytes.Equal([]byte("original"), ab.Bytes()), "want %q, got %q", []byte("original"), ab.Bytes())
 		})
 	})
 
 	t.Run("string copy", func(t *testing.T) {
 		t.Run("empty buffer", func(t *testing.T) {
 			ab := NewAccumulativeSize(128)
-			if s := ab.StringCopy(); s != "" {
-				t.Errorf("StringCopy() = %q, want empty", s)
-			}
+			s := ab.StringCopy()
+			assert.Equal(t, "", s)
 		})
 		t.Run("returns equal string", func(t *testing.T) {
 			ab := NewAccumulativeSize(128)
 			ab.WriteString("hello copy")
-			if s := ab.StringCopy(); s != "hello copy" {
-				t.Errorf("StringCopy() = %q, want %q", s, "hello copy")
-			}
+			s := ab.StringCopy()
+			assert.Equal(t, "hello copy", s)
 		})
 	})
 
@@ -77,9 +70,7 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(16)
 				ab.WriteRune(tt.r)
-				if got := ab.String(); got != tt.expected {
-					t.Errorf("WriteRune(%q) = %q, want %q", tt.r, got, tt.expected)
-				}
+				assert.Equal(t, tt.expected, ab.String())
 			})
 		}
 	})
@@ -101,9 +92,7 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(16)
 				ab.WriteIntBase(tt.value, tt.base)
-				if got := ab.String(); got != tt.expected {
-					t.Errorf("WriteIntBase(%d, %d) = %q, want %q", tt.value, tt.base, got, tt.expected)
-				}
+				assert.Equal(t, tt.expected, ab.String())
 			})
 		}
 	})
@@ -122,9 +111,7 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(16)
 				ab.WriteUintBase(tt.value, tt.base)
-				if got := ab.String(); got != tt.expected {
-					t.Errorf("WriteUintBase(%d, %d) = %q, want %q", tt.value, tt.base, got, tt.expected)
-				}
+				assert.Equal(t, tt.expected, ab.String())
 			})
 		}
 	})
@@ -142,9 +129,7 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(16)
 				ab.WriteBool(tt.value)
-				if got := ab.String(); got != tt.expected {
-					t.Errorf("WriteBool(%v) = %q, want %q", tt.value, got, tt.expected)
-				}
+				assert.Equal(t, tt.expected, ab.String())
 			})
 		}
 	})
@@ -163,9 +148,7 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(32)
 				ab.WriteFormat(tt.format, tt.args...)
-				if got := ab.String(); got != tt.expected {
-					t.Errorf("WriteFormat(%q) = %q, want %q", tt.format, got, tt.expected)
-				}
+				assert.Equal(t, tt.expected, ab.String())
 			})
 		}
 	})
@@ -195,9 +178,7 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(16)
 				ab.WriteBinary(tt.order, binStruct{A: 0x12345678, B: 0xABCD})
-				if !bytes.Equal(ab.Bytes(), tt.expected) {
-					t.Errorf("WriteBinary() = % x, want % x", ab.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, ab.Bytes()), "want %q, got %q", tt.expected, ab.Bytes())
 			})
 		}
 	})
@@ -227,9 +208,7 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(32)
 				ab.WriteX(tt.value)
-				if got := ab.String(); got != tt.expected {
-					t.Errorf("WriteX(%v) = %q, want %q", tt.value, got, tt.expected)
-				}
+				assert.Equal(t, tt.expected, ab.String())
 			})
 		}
 	})
@@ -237,9 +216,7 @@ func TestAccumulative(t *testing.T) {
 	t.Run("write time", func(t *testing.T) {
 		ab := NewAccumulativeSize(32)
 		ab.WriteTime("%Y-%m-%d", time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC))
-		if got := ab.String(); got != "2024-01-15" {
-			t.Errorf("WriteTime() = %q, want %q", got, "2024-01-15")
-		}
+		assert.Equal(t, "2024-01-15", ab.String())
 	})
 
 	t.Run("write uleb128", func(t *testing.T) {
@@ -257,9 +234,7 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(16)
 				ab.WriteULEB128(tt.value)
-				if !bytes.Equal(ab.Bytes(), tt.expected) {
-					t.Errorf("WriteULEB128(%d) = % x, want % x", tt.value, ab.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, ab.Bytes()), "want %q, got %q", tt.expected, ab.Bytes())
 			})
 		}
 	})
@@ -279,30 +254,22 @@ func TestAccumulative(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				ab := NewAccumulativeSize(16)
 				ab.WriteSLEB128(tt.value)
-				if !bytes.Equal(ab.Bytes(), tt.expected) {
-					t.Errorf("WriteSLEB128(%d) = % x, want % x", tt.value, ab.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, ab.Bytes()), "want %q, got %q", tt.expected, ab.Bytes())
 			})
 		}
 	})
 
 	t.Run("cap", func(t *testing.T) {
 		ab := NewAccumulativeSize(0)
-		if ab.Cap() < 0 {
-			t.Errorf("Cap() = %d, want >= 0", ab.Cap())
-		}
+		assert.GreaterOrEqual(t, ab.Cap(), 0)
 		ab.WriteString("hello")
-		if ab.Cap() < ab.Len() {
-			t.Errorf("Cap() = %d, want >= Len() = %d", ab.Cap(), ab.Len())
-		}
+		assert.GreaterOrEqual(t, ab.Cap(), ab.Len())
 	})
 
 	t.Run("grow", func(t *testing.T) {
 		ab := NewAccumulativeSize(0)
 		ab.Grow(1000)
-		if ab.Cap() < 1000 {
-			t.Errorf("after Grow(1000) Cap() = %d, want >= 1000", ab.Cap())
-		}
+		assert.GreaterOrEqual(t, ab.Cap(), 1000)
 		// Grow with a non-positive value must be a no-op and must not panic.
 		ab.Grow(0)
 	})
@@ -310,13 +277,9 @@ func TestAccumulative(t *testing.T) {
 	t.Run("reset", func(t *testing.T) {
 		ab := NewAccumulativeSize(64)
 		ab.WriteString("test data")
-		if ab.Len() == 0 {
-			t.Fatal("expected data before Reset")
-		}
+		require.NotZero(t, ab.Len())
 		ab.Reset()
-		if ab.Len() != 0 {
-			t.Errorf("after Reset Len() = %d, want 0", ab.Len())
-		}
+		assert.Equal(t, 0, ab.Len())
 	})
 
 	t.Run("reset safe", func(t *testing.T) {
@@ -324,13 +287,9 @@ func TestAccumulative(t *testing.T) {
 		ab.WriteString("test data")
 		old := ab.Bytes()
 		ab.ResetSafe()
-		if ab.Len() != 0 {
-			t.Errorf("after ResetSafe Len() = %d, want 0", ab.Len())
-		}
+		assert.Equal(t, 0, ab.Len())
 		for i, b := range old {
-			if b != 0 {
-				t.Fatalf("ResetSafe: underlying byte %d = %d, want 0", i, b)
-			}
+			require.Zero(t, b, "ResetSafe: underlying byte %d, want 0", i)
 		}
 	})
 
@@ -340,9 +299,7 @@ func TestAccumulative(t *testing.T) {
 		}
 		ab := NewAccumulativeSize(64)
 		ab.WriteApplyFn([]byte("test"), addPrefix)
-		if got := ab.String(); got != "prefix:test" {
-			t.Errorf("WriteApplyFn() = %q, want %q", got, "prefix:test")
-		}
+		assert.Equal(t, "prefix:test", ab.String())
 
 		t.Run("empty data still calls fn", func(t *testing.T) {
 			called := false
@@ -351,12 +308,8 @@ func TestAccumulative(t *testing.T) {
 				called = true
 				return append(dst, 'X')
 			})
-			if !called {
-				t.Error("WriteApplyFn() did not call fn for empty data")
-			}
-			if got := ab.String(); got != "X" {
-				t.Errorf("WriteApplyFn(nil) = %q, want %q", got, "X")
-			}
+			assert.True(t, called, "WriteApplyFn() did not call fn for empty data")
+			assert.Equal(t, "X", ab.String())
 		})
 	})
 
@@ -369,9 +322,7 @@ func TestAccumulative(t *testing.T) {
 		// Each iteration feeds the previous result back in, so n=3 yields the
 		// original input repeated 8 times (see Chain.WriteApplyFnN semantics).
 		want := bytes.Repeat([]byte("ab"), 8)
-		if !bytes.Equal(ab.Bytes(), want) {
-			t.Errorf("WriteApplyFnN() = %q, want %q", ab.Bytes(), want)
-		}
+		assert.True(t, bytes.Equal(want, ab.Bytes()), "want %q, got %q", want, ab.Bytes())
 	})
 
 	t.Run("write apply fn string", func(t *testing.T) {
@@ -380,9 +331,7 @@ func TestAccumulative(t *testing.T) {
 		}
 		ab := NewAccumulativeSize(64)
 		ab.WriteApplyFnString("test", addPrefix)
-		if got := ab.String(); got != "prefix:test" {
-			t.Errorf("WriteApplyFnString() = %q, want %q", got, "prefix:test")
-		}
+		assert.Equal(t, "prefix:test", ab.String())
 	})
 
 	t.Run("write apply fn n string", func(t *testing.T) {
@@ -392,33 +341,24 @@ func TestAccumulative(t *testing.T) {
 		ab := NewAccumulativeSize(64)
 		ab.WriteApplyFnNString("ab", duplicate, 3)
 		want := bytes.Repeat([]byte("ab"), 8)
-		if !bytes.Equal(ab.Bytes(), want) {
-			t.Errorf("WriteApplyFnNString() = %q, want %q", ab.Bytes(), want)
-		}
+		assert.True(t, bytes.Equal(want, ab.Bytes()), "want %q, got %q", want, ab.Bytes())
 	})
 
 	t.Run("error", func(t *testing.T) {
 		ab := NewAccumulativeSize(64)
 		ab.WriteString("foo").WriteInt(42).WriteBool(true)
-		if err := ab.Error(); err != nil {
-			t.Errorf("Error() = %v, want nil after successful writes", err)
-		}
+		assert.NoError(t, ab.Error())
 		ab.Reset()
-		if err := ab.Error(); err != nil {
-			t.Errorf("Error() = %v, want nil after Reset", err)
-		}
+		assert.NoError(t, ab.Error())
 	})
 
 	t.Run("to writer", func(t *testing.T) {
 		ab := NewAccumulativeSize(64)
 		ab.WriteString("foo")
 		w := ab.ToWriter()
-		if _, err := w.WriteString("bar"); err != nil {
-			t.Fatalf("Writer.WriteString() error = %v", err)
-		}
-		if got := ab.String(); got != "foobar" {
-			t.Errorf("after Writer.WriteString() = %q, want %q", got, "foobar")
-		}
+		_, err := w.WriteString("bar")
+		require.NoError(t, err)
+		assert.Equal(t, "foobar", ab.String())
 	})
 
 	t.Run("to reader", func(t *testing.T) {
@@ -426,12 +366,8 @@ func TestAccumulative(t *testing.T) {
 		ab.WriteString("hello world")
 		r := ab.ToReader()
 		data, err := io.ReadAll(r)
-		if err != nil {
-			t.Fatalf("Reader.Read() error = %v", err)
-		}
-		if !bytes.Equal(data, []byte("hello world")) {
-			t.Errorf("Reader read %q, want %q", data, "hello world")
-		}
+		require.NoError(t, err)
+		assert.True(t, bytes.Equal([]byte("hello world"), data), "want %q, got %q", []byte("hello world"), data)
 	})
 }
 
