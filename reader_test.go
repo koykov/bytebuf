@@ -73,6 +73,70 @@ func TestReader(t *testing.T) {
 		}
 	})
 
+	t.Run("read extra", func(t *testing.T) {
+		tests := []struct {
+			name    string
+			data    []byte
+			offset  int64
+			size    int
+			want    []byte
+			wantErr error
+		}{
+			{
+				name:    "offset equals length with non-empty p",
+				data:    []byte("0123456789"),
+				offset:  10,
+				size:    4,
+				want:    []byte{},
+				wantErr: io.EOF,
+			},
+			{
+				name:    "offset equals length with empty p",
+				data:    []byte("0123456789"),
+				offset:  10,
+				size:    0,
+				want:    []byte{},
+				wantErr: nil,
+			},
+			{
+				name:    "offset length-1 with p larger than remaining",
+				data:    []byte("0123456789"),
+				offset:  9,
+				size:    3,
+				want:    []byte("9"),
+				wantErr: io.EOF,
+			},
+			{
+				name:    "offset zero on empty buffer",
+				data:    []byte{},
+				offset:  0,
+				size:    4,
+				want:    []byte{},
+				wantErr: io.EOF,
+			},
+			{
+				name:    "negative offset",
+				data:    []byte("0123456789"),
+				offset:  -1,
+				size:    2,
+				want:    nil,
+				wantErr: ErrNegativeOffset,
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				r := NewReader(tt.data)
+				buf := make([]byte, tt.size)
+				n, err := r.ReadAt(buf, tt.offset)
+
+				assert.Equal(t, tt.wantErr, err)
+				assert.Equal(t, len(tt.want), n)
+				assert.True(t, bytes.Equal(tt.want, buf[:n]), "ReadAt() got %v, want %v", buf[:n], tt.want)
+			})
+		}
+	})
+
 	t.Run("read at", func(t *testing.T) {
 		data := []byte("0123456789")
 		r := NewReader(data)
@@ -135,8 +199,6 @@ func TestReader(t *testing.T) {
 
 				assert.Equal(t, tt.wantErr, err)
 				assert.Equal(t, len(tt.want), n)
-				// bytes.Equal treats nil and empty slices as equal, matching
-				// the original assertion (assert.Equal does not).
 				assert.True(t, bytes.Equal(tt.want, buf[:n]), "ReadAt() got %v, want %v", buf[:n], tt.want)
 			})
 		}
@@ -282,6 +344,51 @@ func TestReader(t *testing.T) {
 		assert.Error(t, err, "Second UnreadRune() should fail")
 	})
 
+	t.Run("unread rune extra", func(t *testing.T) {
+		tests := []struct {
+			name    string
+			data    []byte
+			reads   int
+			unreads []error
+		}{
+			{
+				name:    "unread after invalid utf-8 start byte",
+				data:    []byte{0xFF},
+				reads:   1,
+				unreads: []error{ErrBadRune},
+			},
+			{
+				name:    "unread without prior read",
+				data:    []byte("abc"),
+				reads:   0,
+				unreads: []error{ErrOutOfRange},
+			},
+			{
+				name:    "unread twice in a row",
+				data:    []byte("abc"),
+				reads:   1,
+				unreads: []error{nil, ErrOutOfRange},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				r := NewReader(tt.data)
+
+				for i := 0; i < tt.reads; i++ {
+					if _, _, err := r.ReadRune(); err != nil {
+						require.NoError(t, err, "ReadRune() #%d", i+1)
+					}
+				}
+
+				for i, wantErr := range tt.unreads {
+					err := r.UnreadRune()
+					assert.Equal(t, wantErr, err, "UnreadRune() #%d", i+1)
+				}
+			})
+		}
+	})
+
 	t.Run("seek", func(t *testing.T) {
 		data := []byte("0123456789")
 
@@ -369,6 +476,98 @@ func TestReader(t *testing.T) {
 					buf := make([]byte, len(tt.readWant))
 					n, _ := r.Read(buf)
 					assert.True(t, bytes.Equal(tt.readWant, buf[:n]), "want %q, got %q", tt.readWant, buf[:n])
+				}
+			})
+		}
+	})
+
+	t.Run("seek extra", func(t *testing.T) {
+		tests := []struct {
+			name    string
+			data    []byte
+			preRead int
+			offset  int64
+			whence  int
+			wantPos int64
+			wantErr error
+		}{
+			{
+				name:    "seek current zero is a no-op",
+				data:    []byte("0123456789"),
+				preRead: 3,
+				offset:  0,
+				whence:  io.SeekCurrent,
+				wantPos: 3,
+				wantErr: nil,
+			},
+			{
+				name:    "seek end positive overshoot clamps to end",
+				data:    []byte("0123456789"),
+				offset:  5,
+				whence:  io.SeekEnd,
+				wantPos: 10,
+				wantErr: nil,
+			},
+			{
+				name:    "seek current past end clamps to end",
+				data:    []byte("0123456789"),
+				preRead: 8,
+				offset:  5,
+				whence:  io.SeekCurrent,
+				wantPos: 10,
+				wantErr: nil,
+			},
+			{
+				name:    "seek to exact end",
+				data:    []byte("0123456789"),
+				offset:  10,
+				whence:  io.SeekStart,
+				wantPos: 10,
+				wantErr: nil,
+			},
+			{
+				name:    "negative resulting position",
+				data:    []byte("0123456789"),
+				offset:  -5,
+				whence:  io.SeekStart,
+				wantPos: 0,
+				wantErr: ErrNegativePosition,
+			},
+			{
+				name:    "seek end negative overshoot",
+				data:    []byte("0123456789"),
+				offset:  -15,
+				whence:  io.SeekEnd,
+				wantPos: 0,
+				wantErr: ErrNegativePosition,
+			},
+			{
+				name:    "invalid whence",
+				data:    []byte("0123456789"),
+				offset:  0,
+				whence:  100,
+				wantPos: 0,
+				wantErr: ErrUnknownWhence,
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				r := NewReader(tt.data)
+				if tt.preRead > 0 {
+					if _, err := r.Read(make([]byte, tt.preRead)); err != nil {
+						require.NoError(t, err, "pre-read %d bytes", tt.preRead)
+					}
+				}
+
+				pos, err := r.Seek(tt.offset, tt.whence)
+				assert.Equal(t, tt.wantErr, err)
+				assert.Equal(t, tt.wantPos, pos)
+
+				if tt.wantErr == nil {
+					cur, err := r.Seek(0, io.SeekCurrent)
+					require.NoError(t, err, "Seek(0, SeekCurrent)")
+					assert.Equal(t, tt.wantPos, cur, "reader offset after Seek")
 				}
 			})
 		}
