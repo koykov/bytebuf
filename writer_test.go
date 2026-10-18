@@ -3,11 +3,15 @@ package bytebuf
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"math"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/koykov/x2bytes"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/unicode/norm"
 )
 
 type mockMarshaller struct {
@@ -59,17 +63,13 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				n, err := w.Write(tt.data)
 
-				if err != nil {
-					t.Errorf("Write() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if n != len(tt.data) {
-					t.Errorf("Write() wrote %d bytes, want %d", n, len(tt.data))
-				}
+				assert.Equal(t, len(tt.data), n, "Write() byte count")
 
-				if !bytes.Equal(w.Bytes(), tt.expected) {
-					t.Errorf("Bytes() = %v, want %v", w.Bytes(), tt.expected)
-				}
+				// bytes.Equal is kept here so that a nil buffer (empty write)
+				// remains equal to an empty non-nil expected slice.
+				assert.True(t, bytes.Equal(tt.expected, w.Bytes()), "Bytes() = %v, want %v", w.Bytes(), tt.expected)
 			})
 		}
 	})
@@ -102,17 +102,11 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				n, err := w.WriteString(tt.str)
 
-				if err != nil {
-					t.Errorf("WriteString() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if n != len(tt.str) {
-					t.Errorf("WriteString() wrote %d bytes, want %d", n, len(tt.str))
-				}
+				assert.Equal(t, len(tt.str), n, "WriteString() byte count")
 
-				if w.String() != tt.expected {
-					t.Errorf("String() = %s, want %s", w.String(), tt.expected)
-				}
+				assert.Equal(t, tt.expected, w.String(), "String()")
 			})
 		}
 	})
@@ -124,15 +118,11 @@ func TestWriter(t *testing.T) {
 
 		for _, b := range tests {
 			err := w.WriteByte(b)
-			if err != nil {
-				t.Errorf("WriteByte(%d) error = %v", b, err)
-			}
+			assert.NoError(t, err, "WriteByte(%d)", b)
 		}
 
 		expected := tests
-		if !bytes.Equal(w.Bytes(), expected) {
-			t.Errorf("Bytes() = %v, want %v", w.Bytes(), expected)
-		}
+		assert.True(t, bytes.Equal(expected, w.Bytes()), "want %q, got %q", expected, w.Bytes())
 	})
 
 	t.Run("write at", func(t *testing.T) {
@@ -192,16 +182,12 @@ func TestWriter(t *testing.T) {
 
 				n, err := w.WriteAt(tt.data, tt.offset)
 
-				if (err != nil) != tt.wantErr {
-					t.Errorf("WriteAt() error = %v, wantErr %v", err, tt.wantErr)
-				}
-
-				if !tt.wantErr && n != len(tt.data) {
-					t.Errorf("WriteAt() wrote %d bytes, want %d", n, len(tt.data))
-				}
-
-				if !tt.wantErr && !bytes.Equal(w.Bytes(), tt.want) {
-					t.Errorf("After WriteAt bytes = %s, want %s", w.String(), string(tt.want))
+				if tt.wantErr {
+					assert.Error(t, err, "WriteAt() error")
+				} else {
+					assert.NoError(t, err, "WriteAt() error")
+					assert.Equal(t, len(tt.data), n, "WriteAt() byte count")
+					assert.True(t, bytes.Equal(tt.want, w.Bytes()), "After WriteAt bytes: want %q, got %q", tt.want, w.Bytes())
 				}
 			})
 		}
@@ -241,14 +227,10 @@ func TestWriter(t *testing.T) {
 				w.Reset()
 
 				initialCap := w.Cap()
-				if initialCap < tt.growTo {
-					t.Errorf("After Grow(%d) capacity = %d, want at least %d", tt.growTo, initialCap, tt.growTo)
-				}
+				assert.GreaterOrEqual(t, initialCap, tt.growTo, "After Grow(%d) capacity", tt.growTo)
 
 				_, _ = w.Write(tt.writeData)
-				if w.Len() != len(tt.writeData) {
-					t.Errorf("After write length = %d, want %d", w.Len(), len(tt.writeData))
-				}
+				assert.Equal(t, len(tt.writeData), w.Len(), "After write length")
 			})
 		}
 	})
@@ -258,14 +240,10 @@ func TestWriter(t *testing.T) {
 		initialCap := w.Cap()
 
 		w.GrowDelta(100)
-		if w.Cap() < initialCap+100 {
-			t.Errorf("After GrowDelta(100) capacity = %d, want at least %d", w.Cap(), initialCap+100)
-		}
+		assert.GreaterOrEqual(t, w.Cap(), initialCap+100, "After GrowDelta(100) capacity")
 
 		w.GrowDelta(0)
-		if w.Cap() < initialCap+100 {
-			t.Errorf("After GrowDelta(0) capacity decreased")
-		}
+		assert.GreaterOrEqual(t, w.Cap(), initialCap+100, "After GrowDelta(0) capacity decreased")
 	})
 
 	t.Run("write int", func(t *testing.T) {
@@ -306,13 +284,9 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				_, err := w.WriteInt(tt.value)
 
-				if err != nil {
-					t.Errorf("WriteInt() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if !bytes.Equal(w.Bytes(), tt.expected) {
-					t.Errorf("Bytes() = %v, want %v", w.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, w.Bytes()), "want %q, got %q", tt.expected, w.Bytes())
 			})
 		}
 	})
@@ -345,13 +319,9 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				_, err := w.WriteUint(tt.value)
 
-				if err != nil {
-					t.Errorf("WriteUint() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if !bytes.Equal(w.Bytes(), tt.expected) {
-					t.Errorf("Bytes() = %v, want %v", w.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, w.Bytes()), "want %q, got %q", tt.expected, w.Bytes())
 			})
 		}
 	})
@@ -389,13 +359,9 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				_, err := w.WriteFloat(tt.value)
 
-				if err != nil {
-					t.Errorf("WriteFloat() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if !bytes.Equal(w.Bytes(), tt.expected) {
-					t.Errorf("Bytes() = %v, want %v", w.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, w.Bytes()), "want %q, got %q", tt.expected, w.Bytes())
 			})
 		}
 	})
@@ -423,13 +389,9 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				_, err := w.WriteBool(tt.value)
 
-				if err != nil {
-					t.Errorf("WriteBool() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if !bytes.Equal(w.Bytes(), tt.expected) {
-					t.Errorf("Bytes() = %v, want %v", w.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, w.Bytes()), "want %q, got %q", tt.expected, w.Bytes())
 			})
 		}
 	})
@@ -476,18 +438,12 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				n, err := w.WriteBinary(tt.order, tt.value)
 
-				if (err != nil) != tt.wantErr {
-					t.Errorf("WriteBinary() error = %v, wantErr %v", err, tt.wantErr)
-				}
-
-				if !tt.wantErr {
-					if n != len(tt.expect) {
-						t.Errorf("WriteBinary() wrote %d bytes, want %d", n, len(tt.expect))
-					}
-
-					if !bytes.Equal(w.Bytes(), tt.expect) {
-						t.Errorf("Bytes() = %v, want %v", w.Bytes(), tt.expect)
-					}
+				if tt.wantErr {
+					assert.Error(t, err, "WriteBinary() error")
+				} else {
+					assert.NoError(t, err, "WriteBinary() error")
+					assert.Equal(t, len(tt.expect), n, "WriteBinary() byte count")
+					assert.True(t, bytes.Equal(tt.expect, w.Bytes()), "write binary: want %q, got %q", tt.expect, w.Bytes())
 				}
 			})
 		}
@@ -533,17 +489,11 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				n, err := w.WriteX(tt.value)
 
-				if err != nil {
-					t.Errorf("WriteX() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if n != len(tt.expected) {
-					t.Errorf("WriteX() wrote %d bytes, want %d", n, len(tt.expected))
-				}
+				assert.Equal(t, len(tt.expected), n, "WriteX() byte count")
 
-				if w.String() != tt.expected {
-					t.Errorf("String() = %s, want %s", w.String(), tt.expected)
-				}
+				assert.Equal(t, tt.expected, w.String(), "String()")
 			})
 		}
 	})
@@ -554,17 +504,11 @@ func TestWriter(t *testing.T) {
 		w := NewWriter(nil)
 		n, err := w.WriteMarshallerTo(mock)
 
-		if err != nil {
-			t.Errorf("WriteMarshallerTo() error = %v", err)
-		}
+		assert.NoError(t, err)
 
-		if n != mock.Size() {
-			t.Errorf("WriteMarshallerTo() wrote %d bytes, want %d", n, mock.Size())
-		}
+		assert.Equal(t, mock.Size(), n, "WriteMarshallerTo() byte count")
 
-		if !bytes.Equal(w.Bytes(), mock.data) {
-			t.Errorf("Bytes() = %v, want %v", w.Bytes(), mock.data)
-		}
+		assert.True(t, bytes.Equal(mock.data, w.Bytes()), "WriteMarshallerTo(): want %q, got %q", mock.data, w.Bytes())
 	})
 
 	t.Run("write apply fn", func(t *testing.T) {
@@ -578,17 +522,11 @@ func TestWriter(t *testing.T) {
 		w := NewWriter(nil)
 		n, err := w.WriteApplyFn(data, addPrefix)
 
-		if err != nil {
-			t.Errorf("WriteApplyFn() error = %v", err)
-		}
+		assert.NoError(t, err)
 
-		if n != len(expected) {
-			t.Errorf("WriteApplyFn() wrote %d bytes, want %d", n, len(expected))
-		}
+		assert.Equal(t, len(expected), n, "WriteApplyFn() byte count")
 
-		if !bytes.Equal(w.Bytes(), expected) {
-			t.Errorf("Bytes() = %v, want %v", w.Bytes(), expected)
-		}
+		assert.True(t, bytes.Equal(expected, w.Bytes()), "want %q, got %q", expected, w.Bytes())
 	})
 
 	t.Run("wryte apply fn N", func(t *testing.T) {
@@ -602,17 +540,11 @@ func TestWriter(t *testing.T) {
 		w := NewWriter(nil)
 		n, err := w.WriteApplyFnN(data, duplicate, 4)
 
-		if err != nil {
-			t.Errorf("WriteApplyFnN() error = %v", err)
-		}
+		assert.NoError(t, err)
 
-		if n != 32 {
-			t.Errorf("WriteApplyFnN() wrote %d bytes, want 4", n)
-		}
+		assert.Equal(t, 32, n, "WriteApplyFnN() byte count")
 
-		if !bytes.Equal(w.Bytes(), expected) {
-			t.Errorf("Bytes() = %v, want %v", w.Bytes(), expected)
-		}
+		assert.True(t, bytes.Equal(expected, w.Bytes()), "want %q, got %q", expected, w.Bytes())
 	})
 
 	t.Run("write time", func(t *testing.T) {
@@ -623,17 +555,11 @@ func TestWriter(t *testing.T) {
 		w := NewWriter(nil)
 		n, err := w.WriteTime(layout, tm)
 
-		if err != nil {
-			t.Errorf("WriteTime() error = %v", err)
-		}
+		assert.NoError(t, err)
 
-		if n != len(expected) {
-			t.Errorf("WriteTime() wrote %d bytes, want %d", n, len(expected))
-		}
+		assert.Equal(t, len(expected), n, "WriteTime() byte count")
 
-		if w.String() != expected {
-			t.Errorf("String() = %s, want %s", w.String(), expected)
-		}
+		assert.Equal(t, expected, w.String(), "String()")
 	})
 
 	t.Run("write ULEB128", func(t *testing.T) {
@@ -674,17 +600,11 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				n, err := w.WriteULEB128(tt.value)
 
-				if err != nil {
-					t.Errorf("WriteULEB128() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if n != len(tt.expected) {
-					t.Errorf("WriteULEB128() wrote %d bytes, want %d", n, len(tt.expected))
-				}
+				assert.Equal(t, len(tt.expected), n, "WriteULEB128() byte count")
 
-				if !bytes.Equal(w.Bytes(), tt.expected) {
-					t.Errorf("Bytes() = %v, want %v", w.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, w.Bytes()), "want %q, got %q", tt.expected, w.Bytes())
 			})
 		}
 	})
@@ -732,17 +652,11 @@ func TestWriter(t *testing.T) {
 				w := NewWriter(nil)
 				n, err := w.WriteSLEB128(tt.value)
 
-				if err != nil {
-					t.Errorf("WriteSLEB128() error = %v", err)
-				}
+				assert.NoError(t, err)
 
-				if n != len(tt.expected) {
-					t.Errorf("WriteSLEB128() wrote %d bytes, want %d", n, len(tt.expected))
-				}
+				assert.Equal(t, len(tt.expected), n, "WriteSLEB128() byte count")
 
-				if !bytes.Equal(w.Bytes(), tt.expected) {
-					t.Errorf("Bytes() = %v, want %v", w.Bytes(), tt.expected)
-				}
+				assert.True(t, bytes.Equal(tt.expected, w.Bytes()), "want %q, got %q", tt.expected, w.Bytes())
 			})
 		}
 	})
@@ -750,39 +664,27 @@ func TestWriter(t *testing.T) {
 	t.Run("len cap", func(t *testing.T) {
 		w := NewWriter(nil)
 
-		if w.Len() != 0 {
-			t.Errorf("Initial Len() = %d, want 0", w.Len())
-		}
+		assert.Equal(t, 0, w.Len(), "Initial Len()")
 
 		_, _ = w.Write([]byte("test"))
-		if w.Len() != 4 {
-			t.Errorf("After write Len() = %d, want 4", w.Len())
-		}
+		assert.Equal(t, 4, w.Len(), "After write Len()")
 
 		initialCap := w.Cap()
 		w.Grow(100)
-		if w.Cap() <= initialCap {
-			t.Errorf("After Grow Cap() = %d, should be greater than %d", w.Cap(), initialCap)
-		}
+		assert.Greater(t, w.Cap(), initialCap, "After Grow Cap()")
 	})
 
 	t.Run("reset", func(t *testing.T) {
 		w := NewWriter(nil)
 		_, _ = w.Write([]byte("test data"))
 
-		if w.Len() == 0 {
-			t.Error("Writer should have data before reset")
-		}
+		assert.NotZero(t, w.Len(), "Writer should have data before reset")
 
 		w.Reset()
 
-		if w.Len() != 0 {
-			t.Errorf("After Reset Len() = %d, want 0", w.Len())
-		}
+		assert.Equal(t, 0, w.Len(), "After Reset Len()")
 
-		if w.String() != "" {
-			t.Errorf("After Reset String() = %s, want empty", w.String())
-		}
+		assert.Empty(t, w.String(), "After Reset String()")
 	})
 
 	t.Run("reset safe", func(t *testing.T) {
@@ -792,13 +694,9 @@ func TestWriter(t *testing.T) {
 		oldBytes := w.Bytes()
 		w.ResetSafe()
 
-		if w.Len() != 0 {
-			t.Errorf("After ResetSafe Len() = %d, want 0", w.Len())
-		}
+		assert.Equal(t, 0, w.Len(), "After ResetSafe Len()")
 
-		if !bytes.Equal(oldBytes, []byte{0, 0, 0, 0, 0, 0, 0, 0, 0}) {
-			t.Error("ResetSafe modified the underlying slice")
-		}
+		assert.True(t, bytes.Equal([]byte{0, 0, 0, 0, 0, 0, 0, 0, 0}, oldBytes), "ResetSafe modified the underlying slice: want %q, got %q", []byte{0, 0, 0, 0, 0, 0, 0, 0, 0}, oldBytes)
 	})
 
 	t.Run("big data", func(t *testing.T) {
@@ -814,21 +712,13 @@ func TestWriter(t *testing.T) {
 				end = size
 			}
 			n, err := w.Write(largeData[i:end])
-			if err != nil {
-				t.Errorf("Write() error at offset %d: %v", i, err)
-			}
-			if n != end-i {
-				t.Errorf("Write() wrote %d bytes, want %d", n, end-i)
-			}
+			assert.NoError(t, err, "Write() error at offset %d", i)
+			assert.Equal(t, end-i, n, "Write() byte count at offset %d", i)
 		}
 
-		if w.Len() != size {
-			t.Errorf("Final length = %d, want %d", w.Len(), size)
-		}
+		assert.Equal(t, size, w.Len(), "Final length")
 
-		if !bytes.Equal(w.Bytes(), largeData) {
-			t.Error("Data mismatch in large write")
-		}
+		assert.True(t, bytes.Equal(largeData, w.Bytes()), "Data mismatch in large write: want %q, got %q", largeData, w.Bytes())
 
 		t.Run("write at", func(t *testing.T) {
 			size := 10 * 1024 * 1024
@@ -847,12 +737,8 @@ func TestWriter(t *testing.T) {
 			for _, pos := range positions {
 				data := []byte("test")
 				n, err := w.WriteAt(data, pos)
-				if err != nil {
-					t.Errorf("WriteAt(%d) error = %v", pos, err)
-				}
-				if n != len(data) {
-					t.Errorf("WriteAt(%d) wrote %d bytes, want %d", pos, n, len(data))
-				}
+				assert.NoError(t, err, "WriteAt(%d) error", pos)
+				assert.Equal(t, len(data), n, "WriteAt(%d) byte count", pos)
 			}
 
 			for _, pos := range positions {
@@ -861,9 +747,7 @@ func TestWriter(t *testing.T) {
 				}
 				expected := []byte("test")
 				actual := w.Bytes()[pos : pos+4]
-				if !bytes.Equal(actual, expected) {
-					t.Errorf("At position %d got %v, want %v", pos, actual, expected)
-				}
+				assert.True(t, bytes.Equal(expected, actual), "At position %d: want %q, got %q", pos, expected, actual)
 			}
 		})
 	})
@@ -879,24 +763,16 @@ func TestWriter(t *testing.T) {
 		_, _ = w.WriteFloat(3.14159)
 		_, _ = w.WriteBool(true)
 
-		if w.Len() == 0 {
-			t.Error("No data written")
-		}
+		assert.NotZero(t, w.Len(), "No data written")
 
 		data := w.Bytes()
-		if len(data) == 0 {
-			t.Error("Bytes() returned empty slice")
-		}
+		assert.NotEmpty(t, data, "Bytes() returned empty slice")
 
 		saved := w.String()
-		if saved == "" {
-			t.Error("String() returned empty")
-		}
+		assert.NotEmpty(t, saved, "String() returned empty")
 
 		w.Reset()
-		if w.Len() != 0 {
-			t.Error("After Reset Len() != 0")
-		}
+		assert.Zero(t, w.Len(), "After Reset Len() != 0")
 
 		_, _ = w.WriteApplyFn([]byte("applied"), func(dst, p []byte) []byte {
 			return append(dst, append([]byte("prefix_"), p...)...)
@@ -906,9 +782,7 @@ func TestWriter(t *testing.T) {
 		_, _ = w.WriteULEB128(123456)
 		_, _ = w.WriteSLEB128(-123456)
 
-		if w.Len() == 0 {
-			t.Error("Second batch write failed")
-		}
+		assert.NotZero(t, w.Len(), "Second batch write failed")
 	})
 }
 
@@ -974,6 +848,71 @@ func BenchmarkWriter(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			w.Reset()
 			_, _ = w.WriteApplyFn(data, fn)
+		}
+	})
+
+	b.Run("write string", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := []byte(stage.s)
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteString(stage.s)
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteString: mismatch result and expectation")
+			}
+		}
+	})
+
+	b.Run("write byte", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := []byte{'x'}
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_ = w.WriteByte('x')
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteByte: mismatch result and expectation")
+			}
+		}
+	})
+
+	b.Run("write uint", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := []byte(strconv.FormatUint(stage.u, 10))
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteUint(stage.u)
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteUint: mismatch result and expectation")
+			}
+		}
+	})
+
+	b.Run("write hex", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := []byte(hex.EncodeToString(stage.b))
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteHex(stage.b)
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteHex: mismatch result and expectation")
+			}
+		}
+	})
+
+	b.Run("write normalize", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := stage.b // ASCII input is already NFC, so normalization is a no-op
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteNormalize(stage.b, norm.NFC)
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteNormalize: mismatch result and expectation")
+			}
 		}
 	})
 }

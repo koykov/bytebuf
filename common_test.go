@@ -2,15 +2,6 @@ package bytebuf
 
 import "strconv"
 
-type proto struct {
-	b []byte
-	s string
-	i int64
-	u uint64
-	f float64
-	l int
-}
-
 var (
 	stage = &proto{
 		b: []byte("bytes string"),
@@ -22,7 +13,23 @@ var (
 
 	expectWS = []byte("bytes string-foobar string-7439264324321-9827390546234-3.1415")
 	expectMT = []byte("bytes stringfoobar string743926432432198273905462343.1415")
+
+	sinkBytes  []byte
+	sinkString string
+	sinkInt    int
+	sinkInt64  int64
+	sinkByte   byte
+	sinkRune   rune
 )
+
+type proto struct {
+	b []byte
+	s string
+	i int64
+	u uint64
+	f float64
+	l int
+}
 
 func (p *proto) Size() int {
 	if p.l == 0 {
@@ -37,7 +44,7 @@ func (p *proto) Size() int {
 	return p.l
 }
 
-func (p proto) MarshalTo(dst []byte) (int, error) {
+func (p *proto) MarshalTo(dst []byte) (int, error) {
 	dst = append(dst[:0], p.b...)
 	dst = append(dst, p.s...)
 	dst = strconv.AppendInt(dst, p.i, 10)
