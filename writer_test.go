@@ -3,12 +3,15 @@ package bytebuf
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"math"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/koykov/x2bytes"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/unicode/norm"
 )
 
 type mockMarshaller struct {
@@ -845,6 +848,71 @@ func BenchmarkWriter(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			w.Reset()
 			_, _ = w.WriteApplyFn(data, fn)
+		}
+	})
+
+	b.Run("write string", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := []byte(stage.s)
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteString(stage.s)
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteString: mismatch result and expectation")
+			}
+		}
+	})
+
+	b.Run("write byte", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := []byte{'x'}
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_ = w.WriteByte('x')
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteByte: mismatch result and expectation")
+			}
+		}
+	})
+
+	b.Run("write uint", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := []byte(strconv.FormatUint(stage.u, 10))
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteUint(stage.u)
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteUint: mismatch result and expectation")
+			}
+		}
+	})
+
+	b.Run("write hex", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := []byte(hex.EncodeToString(stage.b))
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteHex(stage.b)
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteHex: mismatch result and expectation")
+			}
+		}
+	})
+
+	b.Run("write normalize", func(b *testing.B) {
+		w := NewWriter(nil)
+		want := stage.b // ASCII input is already NFC, so normalization is a no-op
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			_, _ = w.WriteNormalize(stage.b, norm.NFC)
+			if !bytes.Equal(w.Bytes(), want) {
+				b.Error("Writer.WriteNormalize: mismatch result and expectation")
+			}
 		}
 	})
 }

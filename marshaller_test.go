@@ -22,7 +22,7 @@ func TestWriteMarshallerTo(t *testing.T) {
 
 func BenchmarkWriteMarshallerTo(b *testing.B) {
 	b.Run("chain", func(b *testing.B) {
-		cb := NewAccumulativeSize(1024)
+		cb := NewChainSize(1024)
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			cb.Reset().WriteMarshallerTo(stage)

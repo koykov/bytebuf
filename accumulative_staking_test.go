@@ -662,3 +662,56 @@ func TestAccumulativeRangeStringCopy(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkAccumulativeStaking(b *testing.B) {
+	initbuf := func() *Accumulative {
+		ab := NewAccumulativeSize(128)
+		ab.WriteString("foobar").StakeOut().Write(stage.b)
+		return ab
+	}
+
+	b.Run("stake out", func(b *testing.B) {
+		ab := initbuf()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			if ab.StakeOut() != ab {
+				b.Error("Accumulative.StakeOut: unexpected receiver")
+			}
+		}
+	})
+	b.Run("staked bytes", func(b *testing.B) {
+		ab := initbuf()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			sinkBytes = ab.StakedBytes()
+		}
+	})
+	b.Run("staked string", func(b *testing.B) {
+		ab := initbuf()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			sinkString = ab.StakedString()
+		}
+	})
+	b.Run("staked offset", func(b *testing.B) {
+		ab := initbuf()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			sinkInt = ab.StakedOffset()
+		}
+	})
+	b.Run("staked len", func(b *testing.B) {
+		ab := initbuf()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			sinkInt = ab.StakedLen()
+		}
+	})
+	b.Run("stacked entry64", func(b *testing.B) {
+		ab := initbuf()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			sinkInt64 = int64(ab.StackedEntry64())
+		}
+	})
+}

@@ -735,4 +735,73 @@ func BenchmarkReader(b *testing.B) {
 			_, _ = r.ReadAt(buf, offset)
 		}
 	})
+
+	b.Run("read byte", func(b *testing.B) {
+		size := 1024
+		data := make([]byte, size)
+		for i := range data {
+			data[i] = byte(i % 256)
+		}
+
+		r := NewReader(data)
+		b.ReportAllocs()
+		b.ResetTimer()
+		b.SetBytes(int64(size))
+		for i := 0; i < b.N; i++ {
+			_, _ = r.Seek(0, io.SeekStart)
+			var sum byte
+			for j := 0; j < size; j++ {
+				c, err := r.ReadByte()
+				if err != nil {
+					b.FailNow()
+				}
+				sum += c
+			}
+			sinkByte = sum
+		}
+	})
+
+	b.Run("read rune", func(b *testing.B) {
+		size := 1024
+		data := make([]byte, size)
+		for i := range data {
+			data[i] = byte('a' + i%26)
+		}
+
+		r := NewReader(data)
+		b.ReportAllocs()
+		b.ResetTimer()
+		b.SetBytes(int64(size))
+		for i := 0; i < b.N; i++ {
+			_, _ = r.Seek(0, io.SeekStart)
+			var sum rune
+			for j := 0; j < size; j++ {
+				c, _, err := r.ReadRune()
+				if err != nil {
+					b.FailNow()
+				}
+				sum += c
+			}
+			sinkRune = sum
+		}
+	})
+
+	b.Run("seek", func(b *testing.B) {
+		size := 10 * 1024 * 1024 // 10 MB
+		data := make([]byte, size)
+		for i := range data {
+			data[i] = byte(i % 256)
+		}
+
+		r := NewReader(data)
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			pos, err := r.Seek(int64(i%size), io.SeekStart)
+			if err != nil {
+				b.FailNow()
+			}
+			sinkInt64 = pos
+		}
+	})
 }

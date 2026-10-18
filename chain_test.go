@@ -3,6 +3,7 @@ package bytebuf
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"math"
 	"net/url"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"github.com/koykov/x2bytes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/unicode/norm"
 )
 
 func TestChain(t *testing.T) {
@@ -247,6 +249,50 @@ func BenchmarkChain(b *testing.B) {
 		cb := Chain{}
 		for i := 0; i < b.N; i++ {
 			cb.Reset().WriteFormat("int %d; float %f; string %s", 513, 3.1415, "foobar")
+		}
+	})
+	b.Run("write binary", func(b *testing.B) {
+		cb := NewChainSize(128)
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			cb.Reset().WriteBinary(binary.LittleEndian, stage.b)
+			if !bytes.Equal(cb.Bytes(), stage.b) {
+				b.Error("Chain.WriteBinary: mismatch result and expectation")
+			}
+		}
+	})
+	b.Run("write hex", func(b *testing.B) {
+		cb := NewChainSize(128)
+		want := []byte(hex.EncodeToString(stage.b))
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			cb.Reset().WriteHex(stage.b)
+			if !bytes.Equal(cb.Bytes(), want) {
+				b.Error("Chain.WriteHex: mismatch result and expectation")
+			}
+		}
+	})
+	b.Run("write normalize", func(b *testing.B) {
+		cb := NewChainSize(128)
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			cb.Reset().WriteNormalize(stage.b, norm.NFC)
+			if !bytes.Equal(cb.Bytes(), stage.b) {
+				b.Error("Chain.WriteNormalize: mismatch result and expectation")
+			}
+		}
+	})
+	b.Run("write ULEB128", func(b *testing.B) {
+		cb := NewChainSize(128)
+		cb.WriteULEB128(stage.u)
+		want := append([]byte(nil), cb.Bytes()...)
+		cb.Reset()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			cb.Reset().WriteULEB128(stage.u)
+			if !bytes.Equal(cb.Bytes(), want) {
+				b.Error("Chain.WriteULEB128: mismatch result and expectation")
+			}
 		}
 	})
 }
